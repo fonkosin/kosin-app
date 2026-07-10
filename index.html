@@ -357,6 +357,11 @@ function parseExif(buf){
 }
 function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('หมดเวลา')),ms))]);}
 function blobToDataURL(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=()=>rej(f.error||new Error('อ่านไฟล์ไม่สำเร็จ'));f.readAsDataURL(b);});}
+function bufToBase64(buf){
+  const bytes=new Uint8Array(buf);let binary='';const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){binary+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk));}
+  return btoa(binary);
+}
 function resizeImageBlob(file,maxDim,quality){
   return new Promise((resolve,reject)=>{
     const url=URL.createObjectURL(file);
@@ -588,11 +593,15 @@ async function addPhotos(files,code){
     if(arr.length>=MAX_PHOTOS)break;
     if(addBtn)addBtn.innerHTML='<span>⏳</span>กำลังโหลด...';
     try{
-      let buf=null;try{buf=await f.arrayBuffer();}catch(e){}
-      const exif=buf?parseExif(buf):{gps:null,taken:null};
+      // อ่านไฟล์ต้นฉบับแค่ครั้งเดียว แล้วใช้ buffer นี้ซ้ำทุกขั้นตอน (มือถือบางรุ่นเข้าถึงไฟล์จากคลังภาพซ้ำไม่ได้)
+      const buf=await withTimeout(f.arrayBuffer(),9000);
+      const exif=parseExif(buf);
+      const mime=f.type||'image/jpeg';
       let data;
-      try{ data=await withTimeout(resizeImageBlob(f,1600,0.72),9000); }
-      catch(resizeErr){ data=await withTimeout(blobToDataURL(f),9000); } // ย่อไม่ได้/ค้าง (ฟอร์แมต/ขนาดที่เบราว์เซอร์ถอดไม่ออก) → ใช้รูปต้นฉบับแทน ไม่ให้ล้มเหลว
+      try{
+        const copyBlob=new Blob([buf],{type:mime});
+        data=await withTimeout(resizeImageBlob(copyBlob,1280,0.68),9000);
+      }catch(resizeErr){ data='data:'+mime+';base64,'+bufToBase64(buf); } // ย่อไม่ได้/ค้าง → ค่อยแปลงต้นฉบับตอนนี้เท่านั้น (กันกินแรมเกินจำเป็นตอนกรณีปกติที่ย่อสำเร็จ)
       const hash=simpleHash(data);const flags=[];
       if(!exif.gps)flags.push('ไม่มีพิกัด');
       if(exif.taken&&dayDiff(exif.taken,todayKey())>ALLOW_DAYS)flags.push('รูปเก่า');
