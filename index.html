@@ -576,7 +576,7 @@ function renderPhotos(code){
     const tag=p.flags&&p.flags.length?'<span class="ph-tag">'+p.flags[0]+'</span>':'';
     w.innerHTML='<img class="ph'+(p.flags&&p.flags.length?' flagged':'')+'" src="'+p.data+'">'+tag+'<button class="ph-x">✕</button>';
     w.querySelector('.ph-x').onclick=()=>{arr.splice(i,1);renderPhotos(code);recalc();};cont.appendChild(w);});
-  if(arr.length<MAX_PHOTOS){const add=document.createElement('div');add.className='ph-add';add.innerHTML='<span>＋</span>รูป ('+arr.length+'/'+MAX_PHOTOS+')';add.onclick=()=>{activeCode=code;docRecId=null;$('#photoInput').click();};cont.appendChild(add);}
+  if(arr.length<MAX_PHOTOS){const add=document.createElement('label');add.className='ph-add';add.setAttribute('for','photoInput');add.innerHTML='<span>＋</span>รูป ('+arr.length+'/'+MAX_PHOTOS+')';add.addEventListener('click',()=>{activeCode=code;docRecId=null;});cont.appendChild(add);}
   const req=el.querySelector('.req');if(arr.length>0){req.className='req ok';req.textContent='แนบแล้ว '+arr.length+' รูป';}else{req.className='req miss';req.textContent='ต้องแนบรูป ≥1';}
 }
 async function addPhotos(files,code){
