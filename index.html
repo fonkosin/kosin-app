@@ -616,8 +616,11 @@ async function addPhotos(files,code){
       renderPhotos(code);recalc();
     }catch(err){
       renderPhotos(code);
+      const dbg='ไฟล์: '+(f.name||'-')+' · '+Math.round((f.size||0)/1024)+'KB · '+(f.type||'ไม่ทราบชนิด')+'<br>ข้อผิดพลาด: '+((err&&err.name)||'-')+': '+((err&&err.message)||String(err));
       await showModal({icon:'⚠️',iconBg:'var(--danger-bg)',iconFg:'var(--danger)',title:'แนบรูปไม่สำเร็จ',
-        body:'รูปนี้แนบไม่ได้ ลองถ่ายใหม่หรือเลือกรูปอื่นอีกครั้งนะคะ',buttons:[{label:'รับทราบ',val:'ok',cls:'pri'}]});
+        body:'รูปนี้แนบไม่ได้ ลองถ่ายใหม่หรือเลือกรูปอื่นอีกครั้งนะคะ',
+        html:'<div style="font-size:10.5px;color:var(--mut);text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin:0 0 12px;word-break:break-word">'+dbg+'</div>',
+        buttons:[{label:'รับทราบ',val:'ok',cls:'pri'}]});
     }
   }
   if(addBtn&&addBtn.isConnected)addBtn.innerHTML=origLabel;
