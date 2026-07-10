@@ -91,8 +91,8 @@
   .ph.flagged{border:2px solid var(--amber)}
   .ph-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .ph-tag{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-size:9px;background:var(--amber);color:#fff;padding:1px 5px;border-radius:20px;white-space:nowrap}
-  .ph-add{width:56px;height:56px;border-radius:9px;border:1.5px dashed var(--line2);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--mut);font-size:10px}
-  .ph-add span{font-size:18px;line-height:1}
+  .ph-add{width:64px;height:60px;border-radius:9px;border:1.5px dashed var(--line2);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--mut);font-size:9px;text-align:center;line-height:1.2}
+  .ph-add span{font-size:17px;line-height:1}
   .note-in{width:100%;border:1px solid var(--line2);border-radius:9px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--txt)}
   .note-in:focus{outline:none;border-color:var(--green)}
   .warn{background:var(--danger-bg);color:var(--danger);border:1px solid #f0c0c0;border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
@@ -208,7 +208,8 @@
           <button class="send" id="sendBtn" style="flex:1" disabled>ส่งรายงาน</button>
         </div>
       </div>
-      <input type="file" id="photoInput" accept="image/*" class="hidden" multiple>
+      <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
+      <input type="file" id="photoInputGallery" accept="image/*" class="hidden" multiple>
     </div>
     <div id="tabPlan" class="hidden"><div class="body" id="planBody"></div></div>
   </section>
@@ -581,17 +582,20 @@ function renderPhotos(code){
     const tag=p.flags&&p.flags.length?'<span class="ph-tag">'+p.flags[0]+'</span>':'';
     w.innerHTML='<img class="ph'+(p.flags&&p.flags.length?' flagged':'')+'" src="'+p.data+'">'+tag+'<button class="ph-x">✕</button>';
     w.querySelector('.ph-x').onclick=()=>{arr.splice(i,1);renderPhotos(code);recalc();};cont.appendChild(w);});
-  if(arr.length<MAX_PHOTOS){const add=document.createElement('label');add.className='ph-add';add.setAttribute('for','photoInput');add.innerHTML='<span>＋</span>รูป ('+arr.length+'/'+MAX_PHOTOS+')';add.addEventListener('click',()=>{activeCode=code;docRecId=null;});cont.appendChild(add);}
+  if(arr.length<MAX_PHOTOS){
+    const cam=document.createElement('label');cam.className='ph-add';cam.setAttribute('for','photoInput');cam.innerHTML='<span>📷</span>ถ่ายรูป';cam.addEventListener('click',()=>{activeCode=code;docRecId=null;});cont.appendChild(cam);
+    const gal=document.createElement('label');gal.className='ph-add';gal.setAttribute('for','photoInputGallery');gal.innerHTML='<span>🖼️</span>คลังภาพ';gal.addEventListener('click',()=>{activeCode=code;docRecId=null;});cont.appendChild(gal);
+  }
   const req=el.querySelector('.req');if(arr.length>0){req.className='req ok';req.textContent='แนบแล้ว '+arr.length+' รูป';}else{req.className='req miss';req.textContent='ต้องแนบรูป ≥1';}
 }
 async function addPhotos(files,code){
   const arr=selected[code].photos;
   const el=document.querySelector('.task[data-code="'+code+'"]');
-  const addBtn=el&&el.querySelector('.ph-add');
-  const origLabel=addBtn?addBtn.innerHTML:'';
+  const addBtns=el?Array.from(el.querySelectorAll('.ph-add')):[];
+  const origLabels=addBtns.map(b=>b.innerHTML);
   for(const f of files){
     if(arr.length>=MAX_PHOTOS)break;
-    if(addBtn)addBtn.innerHTML='<span>⏳</span>กำลังโหลด...';
+    addBtns.forEach(b=>{if(b.isConnected)b.innerHTML='<span>⏳</span>กำลังโหลด...';});
     try{
       // อ่านไฟล์ต้นฉบับแค่ครั้งเดียว แล้วใช้ buffer นี้ซ้ำทุกขั้นตอน (มือถือบางรุ่นเข้าถึงไฟล์จากคลังภาพซ้ำไม่ได้)
       const buf=await withTimeout(f.arrayBuffer(),9000);
@@ -623,14 +627,16 @@ async function addPhotos(files,code){
         buttons:[{label:'รับทราบ',val:'ok',cls:'pri'}]});
     }
   }
-  if(addBtn&&addBtn.isConnected)addBtn.innerHTML=origLabel;
+  addBtns.forEach((b,i)=>{if(b.isConnected)b.innerHTML=origLabels[i];});
 }
-$('#photoInput').onchange=async e=>{
+async function onPhotoInputChange(e){
   const files=Array.from(e.target.files||[]);e.target.value='';
   if(docRecId){if(files[0]){completeDoc(docRecId);}docRecId=null;return;}
   if(!activeCode||!selected[activeCode])return;
   await addPhotos(files,activeCode);
-};
+}
+$('#photoInput').onchange=onPhotoInputChange;
+$('#photoInputGallery').onchange=onPhotoInputChange;
 function updGroupCount(gid){const g=TASK_GROUPS.find(x=>x.id===gid);const n=g.tasks.filter(t=>selected[t.c]).length;const c=$('[data-cnt="'+gid+'"]');c.textContent=n;c.classList.toggle('show',n>0);}
 function currentHos(){const v=$('#hosInput').value.trim();return window.HOSPITALS.find(h=>h.name===v)||null;}
 function updateHolidayNote(){
