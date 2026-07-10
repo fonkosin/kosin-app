@@ -1,0 +1,876 @@
+<!doctype html>
+<!-- พัฒนาโดย fonkosin -->
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>รายงานงานช่าง · KOSIN</title>
+<style>
+  :root{--green:#F5620F;--green-dk:#ffffff;--green-mid:#ffd9c2;--brand-tint:#FFF0E6;--brand-tintbg:#fff4ec;--brand-tintborder:#f5cba3;--brand-dark:#b34205;--bg:#f5f4f2;--card:#fff;--line:#e6e4e0;--line2:#d3d0ca;
+    --txt:#1a1d21;--mut:#6b7280;--mut2:#9aa0a8;--accent:#185FA5;--accent-bg:#E6F1FB;--danger:#A32D2D;--danger-bg:#FCEBEB;
+    --ok:#0F6E56;--ok-bg:#E1F5EE;--amber:#854F0B;--amber-bg:#FAEEDA}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans Thai","Sarabun",sans-serif;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5}
+  .wrap{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative}
+  .hidden{display:none!important}
+  .top{background:var(--green);color:var(--green-dk);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+  .top .ic{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:17px}
+  .top h1{font-size:16px;margin:0;font-weight:600;flex:1}
+  .top .sub{font-size:11px;color:var(--green-mid)}
+  .top .who{font-size:11px;text-align:right;line-height:1.3}
+  .tabs{display:flex;gap:6px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:54px;z-index:19}
+  .tab{flex:1;border:none;background:var(--bg);color:var(--mut);font-family:inherit;font-size:13.5px;font-weight:500;padding:10px;border-radius:10px;cursor:pointer}
+  .tab.on{background:var(--green);color:var(--green-dk)}
+  .login{padding:34px 24px}
+  .login .logo{width:64px;height:64px;border-radius:18px;background:var(--green);color:var(--green-dk);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px}
+  .login h2{font-size:20px;margin:0 0 4px;text-align:center}
+  .login p{color:var(--mut);margin:0 0 22px;font-size:14px;text-align:center}
+  .namelist{display:flex;flex-direction:column;gap:9px}
+  .namebtn{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:15px;font-family:inherit;text-align:left;color:var(--txt)}
+  .namebtn:active{background:#eef0f3}
+  .namebtn.add{border:1.5px dashed var(--green);color:var(--green);font-weight:500;justify-content:center}
+  .namebtn .av{width:38px;height:38px;border-radius:50%;background:var(--brand-tint);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0}
+  .namebtn .nm{flex:1;font-weight:500}
+  .namebtn .vh{font-size:11px;color:var(--mut)}
+  .pend{font-size:10px;background:var(--amber-bg);color:var(--amber);padding:2px 7px;border-radius:20px}
+  .body{padding:14px 14px 128px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .lbl{font-size:12px;color:var(--mut);font-weight:500;margin:0 0 6px;display:flex;align-items:center;gap:5px}
+  .field{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;background:#fff;color:var(--txt)}
+  .field:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(6,199,85,.15)}
+  textarea.field{resize:vertical;min-height:50px}
+  .hos-info{display:flex;gap:8px;margin-top:8px}
+  .chip{font-size:12px;padding:6px 10px;border-radius:8px;background:var(--accent-bg);color:var(--accent);font-weight:500;flex:1;text-align:center}
+  .chip.trv{background:var(--ok-bg);color:var(--ok)}
+  .hos-free{margin-top:8px;font-size:12px;color:var(--amber);background:var(--amber-bg);border-radius:8px;padding:7px 10px}
+  .btn{border:1px solid var(--line2);background:#fff;border-radius:10px;padding:11px;font-size:14px;font-family:inherit;color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:500;width:100%}
+  .btn:active{transform:scale(.98)}
+  .btn.on{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+  .grp{margin-bottom:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+  .grp-h{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;user-select:none;background:#fafbfc}
+  .grp-h .gt{flex:1;font-size:14px;font-weight:600}
+  .grp-h .cnt{font-size:11px;background:var(--green);color:#fff;border-radius:20px;padding:2px 8px;min-width:20px;text-align:center;display:none}
+  .grp-h .cnt.show{display:inline-block}
+  .grp-h .arw{color:var(--mut2);transition:.2s;font-size:13px}
+  .grp.open .arw{transform:rotate(180deg)}
+  .grp-b{display:none;padding:4px 8px 8px}
+  .grp.open .grp-b{display:block}
+  .task{border-radius:9px;margin-bottom:2px;overflow:hidden}
+  .task-row{display:flex;align-items:center;gap:10px;padding:9px 8px;cursor:pointer;user-select:none}
+  .task-row:active{background:#f3f4f6}
+  .task .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+  .task .box.radio{border-radius:50%}
+  .task.on .box{background:var(--green);border-color:var(--green)}
+  .task.on .box.radio{background:#fff;border:6px solid var(--green);color:transparent}
+  .task .tl{flex:1;font-size:13.5px}
+  .task .pt{font-size:12px;color:var(--mut);font-weight:500}
+  .task.on .pt{color:var(--ok)}
+  .task.on{background:var(--brand-tintbg);border:1px solid var(--brand-tintborder)}
+  .task-detail{padding:2px 8px 12px 40px}
+  .req{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px}
+  .req.miss{background:var(--danger-bg);color:var(--danger)}
+  .req.ok{background:var(--ok-bg);color:var(--ok)}
+  .docnote{font-size:11px;color:var(--amber);background:var(--amber-bg);border-radius:7px;padding:6px 9px;margin-bottom:8px}
+  .docdefer{display:flex;align-items:flex-start;gap:8px;background:var(--amber-bg);border-radius:9px;padding:8px 10px;margin-bottom:8px;cursor:pointer}
+  .docdefer .cb{width:18px;height:18px;border-radius:5px;border:2px solid var(--amber);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px}
+  .docdefer.on .cb{background:var(--amber);border-color:var(--amber)}
+  .docdefer .dt{font-size:11px;color:var(--amber);line-height:1.4}
+  .photos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .ph-wrap{position:relative;width:56px;height:56px}
+  .ph{width:56px;height:56px;border-radius:9px;object-fit:cover;border:1px solid var(--line2)}
+  .ph.flagged{border:2px solid var(--amber)}
+  .ph-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .ph-tag{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-size:9px;background:var(--amber);color:#fff;padding:1px 5px;border-radius:20px;white-space:nowrap}
+  .ph-add{width:56px;height:56px;border-radius:9px;border:1.5px dashed var(--line2);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--mut);font-size:10px}
+  .ph-add span{font-size:18px;line-height:1}
+  .note-in{width:100%;border:1px solid var(--line2);border-radius:9px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--txt)}
+  .note-in:focus{outline:none;border-color:var(--green)}
+  .warn{background:var(--danger-bg);color:var(--danger);border:1px solid #f0c0c0;border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
+  .bar{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#fff;border-top:1px solid var(--line);padding:9px 14px;z-index:15;box-shadow:0 -3px 12px rgba(0,0,0,.06)}
+  .bar .hint{font-size:11px;color:var(--danger);text-align:center;margin:0 0 6px;min-height:14px}
+  .bar .row{display:flex;align-items:center;gap:12px}
+  .bar .tot{flex:1}
+  .bar .tot small{font-size:11px;color:var(--mut);display:block}
+  .bar .tot b{font-size:22px;color:var(--accent)}
+  .bar .trv-s{font-size:11px;color:var(--mut);text-align:right;margin-right:2px}
+  .bar .trv-s b{display:block;font-size:14px;color:var(--txt)}
+  .send{background:var(--green);color:var(--green-dk);border:none;font-weight:600;font-size:15px;padding:12px 20px;border-radius:11px;cursor:pointer}
+  .send:disabled{opacity:.45}
+  .bighead{background:var(--brand-tint);border-radius:14px;padding:16px;margin-bottom:12px}
+  .bighead .t{font-size:11px;color:var(--brand-dark)}
+  .bighead .n{font-size:32px;font-weight:500;color:var(--green);line-height:1.2}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 6px;text-align:center}
+  .tile .tl{font-size:10px;color:var(--mut)}.tile .tv{font-size:18px;font-weight:500}
+  .stchips{display:flex;gap:6px;margin-bottom:14px;font-size:11px}
+  .stchips span{flex:1;text-align:center;border-radius:8px;padding:6px}
+  .st-ok{background:var(--ok-bg);color:var(--ok)}.st-wait{background:var(--amber-bg);color:var(--amber)}.st-no{background:var(--danger-bg);color:var(--danger)}
+  .rec{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:7px}
+  .rec .r1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .rec .nm{font-size:12.5px;font-weight:500}.rec .meta{font-size:10.5px;color:var(--mut);margin-top:2px}
+  .flagtag{font-size:10px;color:var(--amber);background:var(--amber-bg);border-radius:20px;padding:1px 7px;margin-left:4px}
+  .badge{font-size:10.5px;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .docbox{border:1px solid var(--amber);border-radius:11px;padding:11px;margin-bottom:8px}
+  .docbtn{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--green);color:var(--green-dk);border-radius:9px;padding:9px;font-size:12.5px;font-weight:500;margin-top:8px;cursor:pointer}
+  .sechead{font-size:12px;color:var(--mut);font-weight:500;margin:2px 2px 8px}
+  .ok-scr{padding:36px 24px;text-align:center}
+  .ok-scr .big{width:76px;height:76px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 18px}
+  .ok-scr h2{margin:0 0 6px}
+  .ok-scr .summ{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:left;margin:20px 0;font-size:14px}
+  .ok-scr .summ .r{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .ok-scr .summ .r:last-child{border:none}.ok-scr .summ .r b{color:var(--accent)}
+  .ok-scr .tasks{font-size:12.5px;color:var(--mut);text-align:left}
+  .todaybox{font-size:12px;color:var(--mut);margin-top:8px}
+  .link{color:var(--brand-dark);font-size:13px;background:none;border:none;cursor:pointer;text-decoration:underline;padding:8px}
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:22px;z-index:50}
+  .modal{background:#fff;border-radius:16px;max-width:330px;width:100%;padding:20px;text-align:center}
+  .modal .mic{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px}
+  .modal h3{font-size:16px;margin:0 0 8px;font-weight:500}
+  .modal p{font-size:12.5px;color:var(--mut);line-height:1.6;margin:0 0 16px}
+  .modal .mb{display:flex;flex-direction:column;gap:8px}
+  .mbtn{border-radius:10px;padding:11px;font-size:13.5px;font-family:inherit;font-weight:500;cursor:pointer;border:0.5px solid var(--line2);background:#fff;color:var(--txt)}
+  .mbtn.pri{background:var(--green);color:var(--green-dk);border:none}
+  .mbtn.acc{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
+  .modal input,.modal select{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;margin-bottom:10px;background:#fff;color:var(--txt)}
+  .mnote{font-size:10.5px;color:var(--mut2);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="scrLogin">
+    <div class="login">
+      <div class="logo">🔧</div>
+      <h2>รายงานงานช่าง</h2>
+      <p>KOSIN · เลือกชื่อของคุณ</p>
+      <select class="field" id="techPick" style="margin-bottom:10px">
+        <option value="">— เลือกชื่อของคุณ —</option>
+        <optgroup label="ช่าง กทม./ปริมณฑล" id="grpBkk"></optgroup>
+        <optgroup label="ช่าง Hybrid (กทม.+ตจว.)" id="grpHybrid"></optgroup>
+        <optgroup label="ช่างต่างจังหวัด" id="grpTcj"></optgroup>
+        <option value="__add__">＋ เพิ่มชื่อช่างใหม่…</option>
+      </select>
+      <button class="send" id="techGo" style="width:100%">เข้าใช้งาน</button>
+      <div id="loginMsg" style="font-size:12px;color:var(--danger);text-align:center;margin-top:10px;min-height:16px"></div>
+      <p style="font-size:11px;color:var(--mut2);margin-top:8px">ยังไม่มีชื่อ? เลือก "＋ เพิ่มชื่อช่างใหม่" ในรายการ · ใช้ผ่าน LINE จะรู้ว่าเป็นใครอัตโนมัติ</p>
+    </div>
+  </section>
+
+  <section id="scrApp" class="hidden">
+    <div class="top"><button class="ic" id="backBtn" type="button" title="กลับไปเลือกชื่อ" style="border:none;cursor:pointer;font-size:22px;font-weight:600;padding:0;color:inherit">‹</button><div style="flex:1"><h1>รายงานงานช่าง</h1><div class="sub">KOSIN · แตะ ‹ เพื่อกลับ</div></div><div class="who" id="who"></div></div>
+    <div class="tabs"><button class="tab on" id="tabBtnReport">รายงาน</button><button class="tab" id="tabBtnPlan">แพลนงาน</button></div>
+    <div id="tabReport">
+      <div class="body">
+        <div id="dupWarn"></div>
+        <div id="holidayNote" class="hidden" style="background:var(--danger-bg);color:var(--danger);border-radius:10px;padding:9px 12px;font-size:12px;margin-bottom:12px"></div>
+        <div id="boothCtrl" class="card hidden" style="margin-bottom:12px"></div>
+        <div class="card">
+          <div class="lbl">📅 วันที่ <span id="today" style="color:var(--txt);font-weight:600"></span><button id="backdateBtn" type="button" style="margin-left:auto;font-size:11px;border:1px solid var(--line2);border-radius:20px;padding:3px 10px;background:#fff;cursor:pointer;color:var(--accent)">เลือกวันย้อนหลัง</button></div>
+          <div id="backdatePanel" class="hidden" style="margin:8px 0 4px;padding:10px;background:var(--amber-bg);border-radius:10px">
+            <div style="font-size:11px;color:var(--amber);margin-bottom:6px">เลือกวันที่ทำงานจริง (ย้อนหลังได้ · ระบบบันทึกว่าส่งสาย)</div>
+            <input type="date" id="backdateDate" class="field">
+          </div>
+          <div class="lbl" style="margin-top:10px">🏥 โรงพยาบาล / คลินิก / สถานที่</div>
+          <input class="field" id="hosInput" list="hosList" placeholder="เลือกจากรายการ หรือพิมพ์ชื่อเอง" autocomplete="off">
+          <datalist id="hosList"></datalist>
+          <div class="hos-info hidden" id="hosInfo"><div class="chip" id="chipArea"></div><div class="chip trv" id="chipTrv" style="display:none"></div></div>
+          <div class="hos-free hidden" id="hosFree">📝 สถานที่นอกรายการ — เลือกจังหวัดด้านล่าง</div>
+          <div id="typedProvBox" class="hidden" style="margin-top:8px">
+            <input class="field" id="typedProv" list="provList" placeholder="เลือกจังหวัด (เพื่อบันทึกพื้นที่ทำงาน)" autocomplete="off">
+            <datalist id="provList"></datalist>
+          </div>
+        </div>
+        <div class="card hidden" id="pdCard">
+          <div class="lbl">🕒 ช่วงเวลาที่ทำงาน</div>
+          <div id="pdSeg" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
+          <div class="todaybox" id="pdHint">เลือกช่วงเวลาที่ทำงาน — เช้า / บ่าย / ทั้งวัน</div>
+        </div>
+        <div class="lbl" style="margin:2px 4px 8px">✅ เลือกงานที่ทำ — <span style="color:var(--danger)">แต่ละงานต้องแนบรูปอย่างน้อย 1 รูป</span></div>
+        <div id="tasks"></div>
+      </div>
+      <div class="bar">
+        <div class="hint" id="hint"></div>
+        <div class="row">
+          <div class="tot" style="display:none"><b id="trvVal"></b><span id="trvLabel"></span></div>
+          <button class="send" id="sendBtn" style="flex:1" disabled>ส่งรายงาน</button>
+        </div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden" multiple>
+    </div>
+    <div id="tabPlan" class="hidden"><div class="body" id="planBody"></div></div>
+  </section>
+
+  <section id="scrOk" class="hidden">
+    <div class="top"><div class="ic">🔧</div><div style="flex:1"><h1>ส่งรายงานแล้ว</h1><div class="sub">KOSIN</div></div></div>
+    <div class="ok-scr">
+      <div class="big">✓</div><h2>บันทึกเรียบร้อย</h2>
+      <p style="color:var(--mut);margin:4px 0 0" id="okSub">รอหัวหน้าตรวจอนุมัติเพื่อคิดคะแนน</p>
+      <div class="summ" id="okSumm"></div>
+      <button class="send" style="width:100%;padding:14px" id="againBtn">＋ รายงานสถานที่ถัดไป</button>
+      <div class="todaybox" id="todayCount"></div>
+      <button class="link" id="logoutBtn">ออกจากระบบ</button>
+    </div>
+  </section>
+
+  <div id="modalHost"></div>
+</div>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script>
+const TASK_GROUPS=[
+ {id:'A',title:'A — เข้า Case',note:'เลือกได้อันเดียวต่อการเข้าเคส 1 ครั้ง',tasks:[
+   {c:'A1',l:'ทดลองใช้จริง ก่อนสอบราคา',pt:8},{c:'A2',l:'ทดลองใช้ ขณะรอพิจารณาซื้อ',pt:8},{c:'A3',l:'ทดลองใช้ หลังเสนอราคา',pt:8},
+   {c:'A4',l:'ลูกค้าสั่งซื้อแล้ว รอสินค้า',pt:8},{c:'A6',l:'แข่งขันกับบริษัทอื่น',pt:8},{c:'A7',l:'follow up ลูกค้าที่ซื้อแล้ว',pt:8},{c:'A8',l:'นำสินค้าให้เช่า',pt:8}]},
+ {id:'B',title:'B — ติดตั้ง / ออกร้าน / Workshop / นอกเวลา',note:'Workshop (B3) เลือกได้อันเดียว',tasks:[
+   {c:'B1',l:'ติดตั้งเครื่องมือเต็มชุด (จอ+แก๊ส+น้ำ)',pt:4},{c:'B2',l:'ออกร้าน',pt:4},{c:'B3a',l:'Workshop ครึ่งวันเช้า',pt:8},{c:'B3b',l:'Workshop ครึ่งวันบ่าย',pt:12},{c:'B3c',l:'Workshop ทั้งวัน',pt:20},{c:'B4',l:'เคสนอกเวลา / วันหยุด',pt:10}]},
+ {id:'C',title:'C — ตรวจเช็ค',tasks:[{c:'C1',l:'ตรวจเช็คเครื่องมือ (Instruments)',pt:2},{c:'C2',l:'ตรวจเช็ค UNIT',pt:4}]},
+ {id:'D',title:'D — นำเสนอ / แข่งขัน',tasks:[{c:'D1',l:'แข่งขัน present (เครื่องมือ+เอกสาร)',pt:15},{c:'D2',l:'Present นำเสนอเฉย ๆ',pt:8}]},
+ {id:'E',title:'E — ส่งมอบ / ติดตั้ง / demo / สอน',note:'E1–E3 เลือกได้อันเดียว (ระดับสูงครอบต่ำ)',tasks:[
+   {c:'E1',l:'ส่งมอบ ไม่ติดตั้ง',pt:7},{c:'E2',l:'ส่งมอบ+ติดตั้ง ไม่ demo',pt:14},{c:'E3',l:'ส่งมอบ+ติดตั้ง+demo',pt:21},{c:'E4',l:'สอนการใช้งานเครื่องมือ',pt:10}]},
+ {id:'F',title:'F — สนับสนุนการขาย',tasks:[{c:'F1',l:'นำเอกสาร+อธิบายสินค้า (brochure)',pt:2},{c:'F2',l:'นำส่งเครื่องมือเพื่อทดลองใช้',pt:2},{c:'F3',l:'นำส่งเครื่องมือวางทดแทนสินค้าชำรุด',pt:2},{c:'F4',l:'รับเครื่องมือกลับมาตรวจเช็ค',pt:2}]},
+ {id:'G',title:'G — Maintenance',tasks:[{c:'G1',l:'Maintenance เครื่องมือ',pt:5,doc:'ต้องแนบใบ maintenance (ลายเซ็น+ชื่อบรรจง+วันที่+เวลาเริ่ม-เสร็จ)'}]},
+ {id:'H',title:'H — เอกสาร / สัญญา',tasks:[{c:'H1',l:'เปิดซอง',pt:10},{c:'H2',l:'เปิดซองคู่เทียบ',pt:6},{c:'H3',l:'เซ็นสัญญา',pt:5},{c:'H4',l:'วางบิล',pt:5},{c:'H5',l:'รับเช็ค',pt:5},{c:'H6',l:'เอกสารหัก ณ ที่จ่าย',pt:5}]},
+ {id:'I',title:'I — สำนักงาน / เบ็ดเตล็ด',tasks:[{c:'I1',l:'ซื้ออุปกรณ์สำนักงาน',pt:2},{c:'I2',l:'ซ่อมอุปกรณ์สำนักงาน',pt:2},{c:'I3',l:'ทำเอกสารให้ลูกค้า (PM, Stay Ready)',pt:2},{c:'I4',l:'เด็กติดรถ ช่วยเก็บ/ลงของ',pt:2},{c:'I5',l:'ขับรถส่ง/รับของ',pt:3},{c:'I6',l:'ทำงานให้พี่แหม่ม (stand/โรงกลึง/ซื้อของ/รับ-ส่งซ่อม)',pt:2}]},
+ {id:'J',title:'J — งานซ่อม / เทคนิคที่โรงพยาบาล',tasks:[{c:'J1',l:'เช็คเครื่องมือระบบ OR1 ในห้องผ่าตัด',pt:10},{c:'J2a',l:'เทสระบบ Live Surgery — เช้า',pt:10},{c:'J2b',l:'เทสระบบ Live Surgery — บ่าย',pt:10},{c:'J3',l:'Live Surgery จริง (เช้า+บ่าย)',pt:20},{c:'J4',l:'เครื่องสลายนิ่ว ตรวจเช็ค',pt:10},{c:'J5',l:'Duolith ตรวจเช็คเครื่อง',pt:10},{c:'J6',l:'สอนเครื่องมือน้องใหม่',pt:10}]},
+ {id:'K',title:'K — งานอื่นๆ (นอกเหนือ A–J)',tasks:[{c:'K1',l:'งานอื่นๆ',pt:0}]}
+];
+const EXCL=[['A1','A2','A3','A4','A6','A7','A8'],['B3a','B3b','B3c'],['E1','E2','E3']];
+const EXCL_FLAT=EXCL.reduce((a,s)=>a.concat(s),[]);
+const MAX_PHOTOS=5, DOC_GRACE_DAYS=7, ALLOW_DAYS=3, LOC_THRESHOLD_KM=1;
+const TASK_MAP={};TASK_GROUPS.forEach(g=>g.tasks.forEach(t=>{TASK_MAP[t.c]=Object.assign({group:g.id},t);}));
+const SUBMIT_URL=(window.APP_CONFIG&&window.APP_CONFIG.SUBMIT_URL)||"";
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false;
+const BACKDATE_MAX_DAYS=7;
+/* วันประชุมบริษัท (กลางปี/ปลายปี) — ช่าง ตจว. มา HQ = ไม่เบิกเบี้ยเลี้ยง · ใส่วันที่ทีหลัง เช่น {'2026-12-20':'ประชุมปลายปี'} */
+const COMPANY_MEETING={};
+function isMeetingDay(){return currentTech && !!COMPANY_MEETING[effDateKey()];}
+function isTcj(){return currentTech && (currentTech.region||'กทม./ปริมณฑล')==='ต่างจังหวัด';}
+function updateAllowance(){
+  if(isTcj()){$('#trvLabel').textContent='เบี้ยเลี้ยง';$('#trvVal').textContent=perDiemAmt+'.-';}
+  else{$('#trvLabel').textContent='ค่าเดินทาง';const h=currentHos();$('#trvVal').textContent=h?(h.travel+'.-'):'—';}
+}
+const tcjHosMap={};(window.TCJ_HOSPITALS||[]).forEach(h=>{tcjHosMap[h.name]=h;});
+function tcjInfo(name){const h=tcjHosMap[name];if(!h)return null;const z=(window.TCJ_ZONES||{})[currentTech.name]||[];return{province:h.province,inZone:z.indexOf(h.province)>=0};}
+const PD_PERIODS=[{k:'เช้า',a:125},{k:'บ่าย',a:125},{k:'ทั้งวัน',a:250},{k:'ในเขตฐาน',a:0}];
+function buildPdSeg(){
+  const seg=$('#pdSeg');if(!seg)return;seg.innerHTML='';
+  PD_PERIODS.filter(p=>p.k!=='ในเขตฐาน'||pdAllowBase).forEach(p=>{const b=document.createElement('button');b.type='button';b.className='btn'+(p.k===perDiemPeriod?' on':'');
+    b.textContent=p.k;b.onclick=()=>{perDiemPeriod=p.k;perDiemAmt=p.a;buildPdSeg();$('#trvVal').textContent=perDiemAmt+'.-';};seg.appendChild(b);});
+}
+/* การ์ดเลือกช่วงเวลาทำงาน (เช้า/บ่าย/ทั้งวัน) — ใช้ได้ทุกโหมด รวมช่าง กทม.ในเขต กทม. โดยไม่กระทบค่าตอบแทน */
+function showPeriodCard(hint){
+  $('#pdCard').classList.remove('hidden');pdAllowBase=false;
+  if(['เช้า','บ่าย','ทั้งวัน'].indexOf(perDiemPeriod)<0){perDiemPeriod='ทั้งวัน';perDiemAmt=250;}
+  $('#pdSeg').classList.remove('hidden');buildPdSeg();$('#pdHint').innerHTML=hint;
+}
+
+/* ===== ธีมสีจาก config (เปลี่ยน brand สีเดียว = ทั้งแอป) ===== */
+function hx(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function mix(a,b,t){const x=hx(a),y=hx(b);return'#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+function applyTheme(){
+  const th=(window.APP_CONFIG&&window.APP_CONFIG.THEME)||null; if(!th||!th.brand)return;
+  const b=th.brand,on=th.onBrand||'#ffffff',rs=document.documentElement.style;
+  rs.setProperty('--green',b);rs.setProperty('--green-dk',on);
+  rs.setProperty('--green-mid',mix(b,'#ffffff',0.72));
+  rs.setProperty('--brand-tint',mix(b,'#ffffff',0.90));
+  rs.setProperty('--brand-tintbg',mix(b,'#ffffff',0.94));
+  rs.setProperty('--brand-tintborder',mix(b,'#ffffff',0.62));
+  rs.setProperty('--brand-dark',mix(b,'#000000',0.32));
+}
+
+/* ===== อุปกรณ์ที่ใช้ส่ง (บันทึก + ติดธงถ้าเปลี่ยนผิดปกติ ไม่บล็อก) ===== */
+function deviceId(){let d=localStorage.getItem('kosin_deviceid');if(!d){d='dev_'+Math.random().toString(36).slice(2,10);localStorage.setItem('kosin_deviceid',d);}return d;}
+function deviceLabel(){const ua=navigator.userAgent;let os='อุปกรณ์อื่น';if(/iPad/.test(ua))os='iPad';else if(/iPhone/.test(ua))os='iPhone';else if(/Android/.test(ua))os='Android';else if(/Windows/.test(ua))os='Windows';else if(/Mac/.test(ua))os='Mac';return os;}
+function techKey(){return (currentTech&&(currentTech.lineId||currentTech.pin||currentTech.name))||'';}
+function knownDev(){try{return JSON.parse(localStorage.getItem('kosin_techdev')||'{}')}catch(e){return{}}}
+function checkDevice(){ // true = อุปกรณ์ใหม่ผิดจากเดิม (ติดธง)
+  const map=knownDev(),k=techKey(),dev=deviceId(),list=map[k]||[];
+  const isNew=list.length>0 && list.indexOf(dev)<0;
+  if(list.indexOf(dev)<0){list.push(dev);map[k]=list;localStorage.setItem('kosin_techdev',JSON.stringify(map));}
+  return isNew;
+}
+
+/* ===== LINE Login (LIFF) — ทำงานเมื่อใส่ LIFF_ID + เปิดในแอป LINE ===== */
+function initLiff(){
+  const id=(window.APP_CONFIG&&window.APP_CONFIG.LIFF_ID)||''; if(!id)return;
+  const s=document.createElement('script');s.src='https://static.line-scdn.net/liff/edge/2/sdk.js';
+  s.onload=function(){try{liff.init({liffId:id}).then(function(){
+    if(!liff.isLoggedIn()){liff.login();return;}
+    liff.getProfile().then(function(p){
+      // จับคู่ LINE userId กับช่างในรายชื่อ (ถ้าไม่เจอ ใช้ชื่อ LINE)
+      const match=allTechs().find(t=>t.lineId&&t.lineId===p.userId);
+      currentTech=match||{name:p.displayName,vehicle:'',pin:'',lineId:p.userId,status:'active'};
+      enterApp();
+    }).catch(function(){});
+  }).catch(function(){});}catch(e){}};
+  document.body.appendChild(s);
+}
+
+/* ===== EXIF parser (JPEG) → {gps,taken} ===== */
+function parseExif(buf){
+  try{
+    const dv=new DataView(buf); if(dv.getUint16(0)!==0xFFD8)return{gps:null,taken:null};
+    let off=2; const len=dv.byteLength;
+    while(off+4<len){
+      const marker=dv.getUint16(off);
+      if(marker===0xFFE1){
+        const app1len=dv.getUint16(off+2), start=off+4;
+        if(dv.getUint32(start)!==0x45786966){off+=2+app1len;continue;}
+        const tiff=start+6, little=dv.getUint16(tiff)===0x4949;
+        const r16=o=>dv.getUint16(o,little), r32=o=>dv.getUint32(o,little);
+        const ifd0=tiff+r32(tiff+4); let gpsP=0,exP=0; const n0=r16(ifd0);
+        for(let i=0;i<n0;i++){const e=ifd0+2+i*12,t=r16(e);if(t===0x8825)gpsP=tiff+r32(e+8);if(t===0x8769)exP=tiff+r32(e+8);}
+        let taken=null,g=null;
+        if(exP){const ne=r16(exP);for(let i=0;i<ne;i++){const e=exP+2+i*12,t=r16(e);if(t===0x9003||t===0x9004){const cnt=r32(e+4),so=(cnt>4?r32(e+8)+tiff:e+8);let s='';for(let j=0;j<cnt-1;j++)s+=String.fromCharCode(dv.getUint8(so+j));if(!taken)taken=s;}}}
+        if(gpsP){const ng=r16(gpsP);let latR='N',lonR='E',lat=null,lon=null;
+          const rat=o=>{const d=r32(o+4);return d?r32(o)/d:0;};
+          const dms=o=>rat(o)+rat(o+8)/60+rat(o+16)/3600;
+          for(let i=0;i<ng;i++){const e=gpsP+2+i*12,t=r16(e);
+            if(t===1)latR=String.fromCharCode(dv.getUint8(e+8));
+            if(t===3)lonR=String.fromCharCode(dv.getUint8(e+8));
+            if(t===2)lat=dms(r32(e+8)+tiff);
+            if(t===4)lon=dms(r32(e+8)+tiff);}
+          if(lat!=null&&lon!=null){if(latR==='S')lat=-lat;if(lonR==='W')lon=-lon;g={lat:+lat.toFixed(6),lng:+lon.toFixed(6)};}}
+        let tk=null; if(taken&&taken.length>=10)tk=taken.slice(0,10).replace(/:/g,'-');
+        return{gps:g,taken:tk};
+      }
+      if((marker&0xFF00)!==0xFF00)break;
+      off+=2+dv.getUint16(off+2);
+    }
+    return{gps:null,taken:null};
+  }catch(e){return{gps:null,taken:null};}
+}
+function blobToDataURL(b){return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b);});}
+function simpleHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return 'h'+h.toString(16)+'_'+s.length;}
+function haversine(a,b){const R=6371,dLa=(b.lat-a.lat)*Math.PI/180,dLo=(b.lng-a.lng)*Math.PI/180,la1=a.lat*Math.PI/180,la2=b.lat*Math.PI/180;const x=Math.sin(dLa/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+function dayDiff(a,b){return Math.abs((new Date(b)-new Date(a))/86400000);}
+
+/* ===== coords (learned + seed) ===== */
+function loadCoords(){try{return JSON.parse(localStorage.getItem('kosin_hoscoords')||'{}')}catch(e){return{}}}
+function hosCoords(name){const o=loadCoords();if(o[name])return o[name];const h=window.HOSPITALS.find(x=>x.name===name);return h&&h.gps?h.gps:null;}
+function learnCoords(name,g){if(!g)return;const o=loadCoords();if(!o[name]&&!(window.HOSPITALS.find(x=>x.name===name)||{}).gps){o[name]=g;localStorage.setItem('kosin_hoscoords',JSON.stringify(o));}}
+function nearestHos(g){let best=null,bd=1e9;window.HOSPITALS.forEach(h=>{const c=h.gps||loadCoords()[h.name];if(c){const d=haversine(g,c);if(d<bd){bd=d;best={name:h.name,d:d};}}});return best;}
+
+/* ===== hashes ===== */
+function submittedHashes(){try{return JSON.parse(localStorage.getItem('kosin_hashes')||'[]')}catch(e){return[]}}
+function isDup(hash,code){
+  if(submittedHashes().indexOf(hash)>=0)return true;
+  for(const k in selected){for(const p of selected[k].photos){if(p.hash===hash)return true;}}
+  return false;
+}
+
+/* ===== technicians (base + self-added) ===== */
+function newTechs(){try{return JSON.parse(localStorage.getItem('kosin_newtech')||'[]')}catch(e){return[]}}
+function allTechs(){return (window.TECHNICIANS||[]).concat(newTechs());}
+
+/* ===== modal ===== */
+function showModal(opt){
+  return new Promise(res=>{
+    const host=$('#modalHost');
+    const ov=document.createElement('div');ov.className='ov';
+    const btns=(opt.buttons||[]).map((b,i)=>'<button class="mbtn '+(b.cls||'')+'" data-i="'+i+'">'+b.label+'</button>').join('');
+    ov.innerHTML='<div class="modal">'+(opt.icon?'<div class="mic" style="background:'+opt.iconBg+';color:'+opt.iconFg+'">'+opt.icon+'</div>':'')+
+      '<h3>'+opt.title+'</h3>'+(opt.body?'<p>'+opt.body+'</p>':'')+(opt.html||'')+'<div class="mb">'+btns+'</div>'+(opt.note?'<div class="mnote">'+opt.note+'</div>':'')+'</div>';
+    host.appendChild(ov);
+    ov.querySelectorAll('.mbtn').forEach(b=>b.onclick=()=>{const v=opt.buttons[+b.dataset.i].val;host.removeChild(ov);res({val:v,root:null});});
+    opt._ov=ov;
+  });
+}
+
+/* ===== LOGIN (dropdown ค้นหา/เลือกชื่อ + พิมพ์ชื่อใหม่เพื่อเพิ่ม) ===== */
+function techRegion(t){return t.region||'กทม./ปริมณฑล';}
+function techGroup(t){
+  if(techRegion(t)==='กทม./ปริมณฑล')return 'bkk';
+  return (((window.TCJ_HOME||{})[t.name]||[]).indexOf('กทม')>=0)?'hybrid':'tcj';
+}
+function buildLogin(){
+  const g={bkk:$('#grpBkk'),hybrid:$('#grpHybrid'),tcj:$('#grpTcj')};
+  for(const k in g)g[k].innerHTML='';
+  allTechs().forEach(t=>{const o=document.createElement('option');o.value=t.name;o.textContent=t.name+((t.status==='pending'||t.status==='รอยืนยัน')?' · รอยืนยัน':'');(g[techGroup(t)]||g.tcj).appendChild(o);});
+  $('#techPick').value='';$('#loginMsg').textContent='';
+}
+function findTech(name){return allTechs().find(t=>t.name.trim()===String(name).trim());}
+$('#techGo').onclick=()=>{
+  const v=$('#techPick').value;
+  if(v==='__add__'){addTechFlow('');return;}
+  if(!v){$('#loginMsg').textContent='เลือกชื่อก่อนนะคะ';return;}
+  const t=findTech(v);
+  if(!t){$('#loginMsg').textContent='ไม่พบชื่อนี้';return;}
+  const pending=(t.status==='pending'||t.status==='รอยืนยัน');
+  if(pending && SUBMIT_URL){showModal({icon:'<i class="ti ti-clock-hour-4"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'รอแอดมินยืนยันก่อนนะคะ 😊',body:'ชื่อของคุณถูกเพิ่มเข้าระบบแล้ว รอแอดมินยืนยันสักครู่ แล้วจะเข้าใช้งานได้เลยค่ะ',buttons:[{label:'รับทราบ',val:'ok',cls:'pri'}]});return;}
+  currentTech=t;enterApp();
+};
+$('#techPick').addEventListener('change',()=>{if($('#techPick').value==='__add__')addTechFlow('');});
+async function addTechFlow(prefillName){
+  const host=$('#modalHost');
+  const ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML='<div class="modal"><div class="mic" style="background:var(--accent-bg);color:var(--accent)">＋</div><h3>เพิ่มช่างใหม่</h3><p>กรอกชื่อ + เลือกพื้นที่</p><input id="ntName" placeholder="ชื่อ–นามสกุล"><select id="ntReg"><option>กทม./ปริมณฑล</option><option>ต่างจังหวัด</option></select><select id="ntVeh"><option value="">เลือกยานพาหนะ</option><option>จักรยานยนต์</option><option>รถยนต์</option></select><div class="mb"><button class="mbtn pri" id="ntSave">บันทึกช่างใหม่</button><button class="mbtn" id="ntCancel">ยกเลิก</button></div><div class="mnote">จะขึ้นสถานะ "รอแอดมินยืนยัน"</div></div>';
+  host.appendChild(ov);
+  ov.querySelector('#ntName').value=prefillName||'';
+  const regSel=ov.querySelector('#ntReg'),vehSel=ov.querySelector('#ntVeh');
+  const toggleVeh=()=>{vehSel.style.display=regSel.value==='ต่างจังหวัด'?'none':'block';};
+  regSel.onchange=toggleVeh;toggleVeh();
+  ov.querySelector('#ntCancel').onclick=()=>{host.removeChild(ov);$('#techPick').value='';};
+  ov.querySelector('#ntSave').onclick=()=>{
+    const nm=ov.querySelector('#ntName').value.trim(),vh=ov.querySelector('#ntVeh').value.trim(),reg=ov.querySelector('#ntReg').value;
+    if(!nm){ov.querySelector('#ntName').focus();return;}
+    const arr=newTechs();arr.push({name:nm,vehicle:vh,pin:'',region:reg,status:'pending'});localStorage.setItem('kosin_newtech',JSON.stringify(arr));
+    if(SUBMIT_URL)fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'addtech',name:nm,vehicle:vh,region:reg})}).catch(()=>{});
+    host.removeChild(ov);buildLogin();$('#techPick').value=nm;
+  };
+}
+
+/* ===== helpers ===== */
+function todayStr(d){d=d||new Date();const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return d.getDate()+' '+m[d.getMonth()]+' '+String((d.getFullYear()+543)%100);}
+function dkey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function todayKey(){return dkey();}
+function weekStartKey(){const d=new Date();const off=(d.getDay()+6)%7;d.setDate(d.getDate()-off);return dkey(d);}
+function getReports(){try{return JSON.parse(localStorage.getItem('kosin_reports')||'[]')}catch(e){return[]}}
+function saveReports(a){localStorage.setItem('kosin_reports',JSON.stringify(a));}
+function myRecs(){return getReports().filter(r=>r.pin===currentTech.pin||r.tech===currentTech.name);}
+
+/* ===== enter app ===== */
+function enterApp(){
+  $('#scrLogin').classList.add('hidden');$('#scrOk').classList.add('hidden');$('#scrApp').classList.remove('hidden');
+  $('#who').innerHTML=currentTech.name+'<br>'+(isTcj()?'ต่างจังหวัด':(currentTech.vehicle||''));
+  const dl=$('#hosList');dl.innerHTML='';const seen={};
+  [].concat(window.HOSPITALS||[],window.TCJ_HOSPITALS||[]).forEach(h=>{if(!seen[h.name]){seen[h.name]=1;const o=document.createElement('option');o.value=h.name;dl.appendChild(o);}});
+  const pl=$('#provList');pl.innerHTML='';const ps={};(window.TCJ_HOSPITALS||[]).forEach(h=>{if(h.province!=='กทม')ps[h.province]=1;});['กทม','นนทบุรี','ปทุมธานี','สมุทรปราการ','สมุทรสาคร','นครปฐม'].forEach(p=>ps[p]=1);Object.keys(ps).sort().forEach(p=>{const o=document.createElement('option');o.value=p;pl.appendChild(o);});
+  switchTab('report');resetForm();
+}
+function switchTab(name){
+  const map={report:['tabBtnReport','tabReport'],plan:['tabBtnPlan','tabPlan']};
+  for(const n in map){$('#'+map[n][0]).classList.toggle('on',n===name);$('#'+map[n][1]).classList.toggle('hidden',n!==name);}
+  if(name==='plan')renderPlan();
+}
+$('#tabBtnReport').onclick=()=>switchTab('report');
+$('#tabBtnPlan').onclick=()=>switchTab('plan');
+
+/* ===== REPORT ===== */
+function resetForm(){
+  $('#today').textContent=todayStr();clearBackdate();buildTasks();
+  $('#hosInput').value='';$('#hosInfo').classList.add('hidden');$('#hosFree').classList.add('hidden');$('#dupWarn').innerHTML='';$('#typedProv').value='';$('#typedProvBox').classList.add('hidden');
+  $('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='—';gps='';selected={};
+  perDiemPeriod='ทั้งวัน';perDiemAmt=250;boothFull=true;$('#pdCard').classList.add('hidden');$('#boothCtrl').classList.add('hidden');
+  $('#hosInput').placeholder='เลือก/พิมพ์ชื่อ รพ. (ที่ไหนก็ได้ ข้ามเขตได้)';
+  window.scrollTo(0,0);recalc();
+}
+function buildTasks(){
+  const box=$('#tasks');box.innerHTML='';
+  TASK_GROUPS.forEach(g=>{
+    const grp=document.createElement('div');grp.className='grp';grp.dataset.g=g.id;
+    grp.innerHTML='<div class="grp-h"><span class="gt">กลุ่ม '+g.title+'</span><span class="cnt" data-cnt="'+g.id+'">0</span><span class="arw">▼</span></div><div class="grp-b"></div>';
+    const body=grp.querySelector('.grp-b');
+    if(g.note){const n=document.createElement('div');n.style.cssText='font-size:11px;color:var(--amber);padding:4px 8px 2px';n.textContent='ℹ️ '+g.note;body.appendChild(n);}
+    g.tasks.forEach(t=>{
+      const radio=EXCL_FLAT.indexOf(t.c)>=0;
+      const el=document.createElement('div');el.className='task';el.dataset.code=t.c;
+      el.innerHTML='<div class="task-row"><div class="box'+(radio?' radio':'')+'">'+(radio?'':'✓')+'</div><div class="tl">'+t.l+'</div></div>'+
+        '<div class="task-detail hidden">'+(t.doc?'<div class="docnote">⚠️ '+t.doc+'</div>':'')+
+        (t.c==='G1'?'<div class="docdefer" data-defer><div class="cb">✓</div><div class="dt">ยังไม่มีใบเซ็น — <b>แนบภายหลังได้ภายใน '+DOC_GRACE_DAYS+' วัน</b> (แนบรูปงานตอนนี้ก่อน)</div></div>':'')+
+        '<input class="desc-in" style="width:100%;border:1px solid '+(t.c==='K1'?'var(--green)':'var(--line2)')+';border-radius:9px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--txt);margin-bottom:8px" placeholder="'+(t.c==='K1'?'ระบุงานที่ทำ (จำเป็น)':'รายละเอียดงานที่ทำ (ถ้ามี)')+'">'+
+        '<span class="req miss">ต้องแนบรูป ≥1</span><div class="photos"></div><input class="note-in" placeholder="ปัญหาที่พบ (ถ้ามี)"></div>';
+      el.querySelector('.task-row').onclick=()=>toggleTask(t.c,g.id,el);
+      el.querySelector('.note-in').oninput=e=>{if(selected[t.c])selected[t.c].note=e.target.value;};
+      const kd=el.querySelector('.desc-in');if(kd)kd.oninput=e=>{if(selected[t.c]){selected[t.c].desc=e.target.value;recalc();}};
+      const df=el.querySelector('[data-defer]');if(df)df.onclick=()=>{if(!selected[t.c])return;selected[t.c].defer=!selected[t.c].defer;df.classList.toggle('on',selected[t.c].defer);};
+      body.appendChild(el);
+    });
+    grp.querySelector('.grp-h').onclick=()=>grp.classList.toggle('open');
+    box.appendChild(grp);
+  });
+}
+function toggleTask(code,gid,el){
+  if(selected[code]){delete selected[code];el.classList.remove('on');el.querySelector('.task-detail').classList.add('hidden');}
+  else{
+    const set=EXCL.find(s=>s.indexOf(code)>=0);
+    if(set)set.forEach(c=>{if(c!==code&&selected[c]){delete selected[c];const o=document.querySelector('.task[data-code="'+c+'"]');if(o){o.classList.remove('on');o.querySelector('.task-detail').classList.add('hidden');}updGroupCount(TASK_MAP[c].group);}});
+    const t=TASK_MAP[code];selected[code]={code:code,label:t.l,pt:t.pt,note:'',desc:'',photos:[],defer:false};
+    el.classList.add('on');el.querySelector('.task-detail').classList.remove('hidden');renderPhotos(code);
+  }
+  updGroupCount(gid);recalc();
+}
+function renderPhotos(code){
+  const el=document.querySelector('.task[data-code="'+code+'"]');if(!el||!selected[code])return;
+  const cont=el.querySelector('.photos'),arr=selected[code].photos;cont.innerHTML='';
+  arr.forEach((p,i)=>{const w=document.createElement('div');w.className='ph-wrap';
+    const tag=p.flags&&p.flags.length?'<span class="ph-tag">'+p.flags[0]+'</span>':'';
+    w.innerHTML='<img class="ph'+(p.flags&&p.flags.length?' flagged':'')+'" src="'+p.data+'">'+tag+'<button class="ph-x">✕</button>';
+    w.querySelector('.ph-x').onclick=()=>{arr.splice(i,1);renderPhotos(code);recalc();};cont.appendChild(w);});
+  if(arr.length<MAX_PHOTOS){const add=document.createElement('div');add.className='ph-add';add.innerHTML='<span>＋</span>รูป ('+arr.length+'/'+MAX_PHOTOS+')';add.onclick=()=>{activeCode=code;docRecId=null;$('#photoInput').click();};cont.appendChild(add);}
+  const req=el.querySelector('.req');if(arr.length>0){req.className='req ok';req.textContent='แนบแล้ว '+arr.length+' รูป';}else{req.className='req miss';req.textContent='ต้องแนบรูป ≥1';}
+}
+async function addPhotos(files,code){
+  const arr=selected[code].photos;
+  for(const f of files){
+    if(arr.length>=MAX_PHOTOS)break;
+    let buf=null;try{buf=await f.arrayBuffer();}catch(e){}
+    const exif=buf?parseExif(buf):{gps:null,taken:null};
+    const data=await blobToDataURL(f);const hash=simpleHash(data);const flags=[];
+    if(!exif.gps)flags.push('ไม่มีพิกัด');
+    if(exif.taken&&dayDiff(exif.taken,todayKey())>ALLOW_DAYS)flags.push('รูปเก่า');
+    if(isDup(hash,code)){
+      const a=await showModal({icon:'<i class="ti ti-photo-search"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'รูปนี้เคยส่งไปแล้วนะคะ 😊',
+        body:'รูปนี้เหมือนกับที่เคยส่ง — ถ้าเป็นคนละงาน รบกวนถ่ายใหม่หน้างานอีกครั้งนะคะ จะได้เป็นหลักฐานของงานนี้จริง ๆ',
+        buttons:[{label:'📷 ถ่ายรูปใหม่',val:'new',cls:'pri'},{label:'ใช้รูปนี้ต่อ',val:'use'}],note:'ไม่บังคับ — ส่งต่อได้ (ระบบจะบันทึกให้หัวหน้าดูอีกที)'});
+      if(a.val!=='use')continue;
+      flags.push('รูปซ้ำ');
+    }
+    arr.push({data:data,hash:hash,gps:exif.gps,taken:exif.taken,flags:flags});
+    renderPhotos(code);recalc();
+  }
+}
+$('#photoInput').onchange=async e=>{
+  const files=Array.from(e.target.files||[]);e.target.value='';
+  if(docRecId){if(files[0]){completeDoc(docRecId);}docRecId=null;return;}
+  if(!activeCode||!selected[activeCode])return;
+  await addPhotos(files,activeCode);
+};
+function updGroupCount(gid){const g=TASK_GROUPS.find(x=>x.id===gid);const n=g.tasks.filter(t=>selected[t.c]).length;const c=$('[data-cnt="'+gid+'"]');c.textContent=n;c.classList.toggle('show',n>0);}
+function currentHos(){const v=$('#hosInput').value.trim();return window.HOSPITALS.find(h=>h.name===v)||null;}
+function updateHolidayNote(){
+  const el=$('#holidayNote'),bc=$('#boothCtrl');if(!el)return;
+  if(!isHolidayDate()){el.classList.add('hidden');if(bc)bc.classList.add('hidden');return;}
+  const di=dayInfo(effDateKey());const hc=holidayCalc();
+  let extra='';if(hc.bonus)extra+=' · +ออกร้าน/workshop '+hc.bonus;if(hc.ot)extra+=' · มี OT (เบิกแยก)';
+  el.innerHTML='🌴 วันหยุด: '+di.name+' — ทำงานได้ปกติ'+extra;el.classList.remove('hidden');
+  if(bc){if(hc.hasBooth){bc.classList.remove('hidden');
+    bc.innerHTML='<div style="font-size:11.5px;color:var(--amber);margin-bottom:7px">🎪 ออกร้าน/workshop วันหยุด — เต็มวัน 600 · ครึ่งวัน 300</div><div style="display:flex;gap:6px"><button class="btn'+(boothFull?' on':'')+'" data-booth="full">ทั้งวัน 600</button><button class="btn'+(!boothFull?' on':'')+'" data-booth="half">ครึ่งวัน 300</button></div>';
+    bc.querySelectorAll('[data-booth]').forEach(b=>b.onclick=()=>{boothFull=b.dataset.booth==='full';updateHolidayNote();});
+  }else bc.classList.add('hidden');}
+}
+function recalc(){
+  const sel=Object.values(selected);
+  updateHolidayNote();
+  const hname=$('#hosInput').value.trim();const missing=sel.filter(s=>s.photos.length===0);
+  let ok=true,hint='';
+  const kMiss=sel.some(s=>s.code==='K1'&&!(s.desc&&s.desc.trim()));
+  if(!hname){ok=false;hint='• กรอกชื่อสถานที่';}else if(sel.length===0){ok=false;hint='• เลือกงานอย่างน้อย 1 งาน';}else if(missing.length){ok=false;hint='• ยังขาดรูปแนบ '+missing.length+' งาน';}else if(kMiss){ok=false;hint='• ระบุรายละเอียด "งานอื่นๆ" ก่อนส่ง';}
+  $('#sendBtn').disabled=!ok;$('#hint').textContent=ok?'':hint;
+}
+/* ค่าตอบแทนอิงสถานที่ (ไขว้เขตได้): กทม./ปริมณฑล=ค่าจุด · ตจว.=เบี้ยเลี้ยง(นอกฐาน) */
+function provBkk(a){return (a==='กทม.'||a==='กทม')?'กทม':a;}
+function resolveHos(name){
+  const base=(window.TCJ_HOME||{})[currentTech.name]||[];
+  const isBkkTech=techRegion(currentTech)==='กทม./ปริมณฑล';
+  const bh=window.HOSPITALS.find(x=>x.name===name);
+  if(bh){const prov=provBkk(bh.area);
+    if(base.indexOf(prov)>=0)return{mode:'ฐาน',province:prov};        // อยู่ในจังหวัดฐาน -> 0 (hybrid ที่ กทม.)
+    if(isBkkTech)return{mode:'ค่าจุด',area:bh.area,travel:bh.travel};  // ช่าง กทม. ที่ รพ.กทม. -> ค่าจุด
+    return{mode:'เบี้ยเลี้ยง',province:prov};                          // ช่าง ตจว./hybrid มา กทม. (นอกฐาน) -> เบี้ยเลี้ยง 250
+  }
+  const ti=tcjInfo(name);
+  if(ti){if(base.indexOf(ti.province)>=0)return{mode:'ฐาน',province:ti.province};
+    return{mode:'เบี้ยเลี้ยง',province:ti.province};}
+  return null;
+}
+function applyHos(){
+  const v=$('#hosInput').value.trim();const r=v?resolveHos(v):null;
+  $('#hosInfo').classList.add('hidden');$('#hosFree').classList.add('hidden');$('#pdCard').classList.add('hidden');$('#typedProvBox').classList.add('hidden');
+  if(r&&r.mode==='ค่าจุด'){
+    $('#hosInfo').classList.remove('hidden');
+    $('#chipArea').textContent='📍 '+(r.area||'-');$('#chipTrv').textContent='ค่าเดินทาง '+r.travel+' บาท';
+    $('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent=r.travel+'.-';
+    showPeriodCard('📍 '+(r.area||'กทม.')+' · เลือกช่วงเวลาที่ทำงาน — เช้า/บ่าย/ทั้งวัน');
+  }else if(r&&r.mode==='ฐาน'){
+    $('#hosFree').classList.remove('hidden');$('#hosFree').textContent='📍 จังหวัด '+r.province+' — จังหวัดฐานของคุณ (ในเขตทำงาน)';
+    $('#trvLabel').textContent='ค่าตอบแทน';$('#trvVal').textContent='0.-';
+  }else if(r&&r.mode==='เบี้ยเลี้ยง'){
+    $('#pdCard').classList.remove('hidden');pdAllowBase=false;   // รู้จังหวัดแล้ว (นอกเขต) → ห้ามกด "ในเขตฐาน"
+    if(isMeetingDay()){perDiemPeriod='ประชุม';perDiemAmt=0;$('#pdSeg').classList.add('hidden');$('#pdHint').innerHTML='📍 '+r.province+' · <b>ประชุมบริษัท — ไม่เบิกเบี้ยเลี้ยง</b>';}
+    else if(isHolidayDate()){perDiemPeriod='ทั้งวัน';perDiemAmt=250;$('#pdSeg').classList.add('hidden');$('#pdHint').innerHTML='📍 จังหวัด '+r.province+' · <b style="color:var(--ok)">นอกเขต วันหยุด → นับเต็มวัน</b>';}
+    else{if(perDiemAmt===0){perDiemPeriod='ทั้งวัน';perDiemAmt=250;}$('#pdSeg').classList.remove('hidden');buildPdSeg();$('#pdHint').innerHTML='📍 จังหวัด '+r.province+' · <b style="color:var(--ok)">นอกเขต → เลือก เช้า/บ่าย/ทั้งวัน</b>';}
+    $('#trvLabel').textContent='เบี้ยเลี้ยง';$('#trvVal').textContent=perDiemAmt+'.-';
+  }else if(v){
+    // นอกรายการ (พิมพ์เอง) → ให้เลือกจังหวัด แล้วคิดค่าตอบแทนตามจังหวัด
+    $('#hosFree').classList.remove('hidden');$('#hosFree').textContent='📝 สถานที่นอกรายการ — เลือกจังหวัดด้านล่าง';
+    $('#typedProvBox').classList.remove('hidden');
+    const prov=$('#typedProv').value.trim();const base=(window.TCJ_HOME||{})[currentTech.name]||[];const isBkkTech=techRegion(currentTech)==='กทม./ปริมณฑล';
+    if(!prov){$('#trvLabel').textContent='ค่าตอบแทน';$('#trvVal').textContent='—';}
+    else if(base.indexOf(prov)>=0){$('#trvLabel').textContent='ค่าตอบแทน';$('#trvVal').textContent='0.-';$('#hosFree').textContent='📍 '+prov+' — จังหวัดฐาน (ในเขตทำงาน)';}
+    else if(isBkkTech&&prov==='กทม'){$('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='75.-';showPeriodCard('📍 กทม. · เลือกช่วงเวลาที่ทำงาน — เช้า/บ่าย/ทั้งวัน');}
+    else if(isBkkTech&&PARIMONTHON.indexOf(prov)>=0){$('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='รอพิจารณา';$('#hosFree').textContent='📍 '+prov+' (ปริมณฑล) นอกลิสต์ — รอหัวหน้าพิจารณา';showPeriodCard('📍 '+prov+' · เลือกช่วงเวลาที่ทำงาน — เช้า/บ่าย/ทั้งวัน');}
+    else{$('#pdCard').classList.remove('hidden');pdAllowBase=false;
+      if(isMeetingDay()){perDiemPeriod='ประชุม';perDiemAmt=0;$('#pdSeg').classList.add('hidden');$('#pdHint').innerHTML='📍 '+prov+' · <b>ประชุมบริษัท — ไม่เบิกเบี้ยเลี้ยง</b>';}
+      else if(isHolidayDate()){perDiemPeriod='ทั้งวัน';perDiemAmt=250;$('#pdSeg').classList.add('hidden');$('#pdHint').innerHTML='📍 '+prov+' · <b style="color:var(--ok)">นอกเขต วันหยุด → นับเต็มวัน</b>';}
+      else{if(perDiemAmt===0){perDiemPeriod='ทั้งวัน';perDiemAmt=250;}$('#pdSeg').classList.remove('hidden');buildPdSeg();$('#pdHint').innerHTML='📍 '+prov+' · <b style="color:var(--ok)">นอกเขต → เลือก เช้า/บ่าย/ทั้งวัน</b>';}
+      $('#trvLabel').textContent='เบี้ยเลี้ยง';$('#trvVal').textContent=perDiemAmt+'.-';}
+  }else{
+    $('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='—';
+  }
+  if(v)checkDup(v);else $('#dupWarn').innerHTML='';
+  recalc();
+}
+$('#hosInput').addEventListener('input',applyHos);
+$('#typedProv').addEventListener('input',()=>{applyHos();recalc();});
+
+/* ===== ส่งย้อนหลัง (ป่วย/เหตุจำเป็น) — ต้องรออนุมัติ ===== */
+function thFromKey(k){return todayStr(new Date(k+'T00:00:00'));}
+function effDateKey(){return reportDate?reportDate.key:todayKey();}
+function effDateTh(){return reportDate?reportDate.th:todayStr();}
+$('#backdateBtn').onclick=()=>{
+  const p=$('#backdatePanel'),opening=p.classList.contains('hidden');p.classList.toggle('hidden');
+  if(opening){const y=new Date();y.setDate(y.getDate()-1);$('#backdateDate').max=dkey(y);}
+  else clearBackdate();
+};
+function onBackdate(){
+  const d=$('#backdateDate').value;
+  if(d){reportDate={key:d,th:thFromKey(d)};$('#today').innerHTML=reportDate.th+' <span style="color:var(--amber);font-size:11px;font-weight:400">· ย้อนหลัง (บันทึกส่งสาย)</span>';}
+  else{reportDate=null;$('#today').textContent=todayStr();}
+  applyHos();
+}
+$('#backdateDate').onchange=onBackdate;
+function clearBackdate(){reportDate=null;$('#backdateDate').value='';$('#today').textContent=todayStr();$('#backdatePanel').classList.add('hidden');}
+function checkDup(name){const dup=getReports().some(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.hospital===name&&r.dateKey===effDateKey());$('#dupWarn').innerHTML=dup?'<div class="warn">⚠️ <div>วันนี้คุณรายงาน <b>'+name+'</b> ไปแล้ว — ตรวจสอบก่อนส่งซ้ำ</div></div>':'';}
+
+/* ===== SUBMIT ===== */
+async function doSubmit(){
+  const hname=$('#hosInput').value.trim();if(!hname)return;
+  const h=currentHos();const sel=Object.values(selected);if(!sel.length)return;
+  if(sel.some(s=>s.photos.length===0))return;
+  // เช็คพิกัดจากรูปเทียบสถานที่แบบเงียบ ๆ — ไม่เตือนช่าง แค่ติดธงให้หลังบ้าน
+  let locFlag=false;
+  const coords=hosCoords(hname);
+  const photoGps=[];sel.forEach(s=>s.photos.forEach(p=>{if(p.gps)photoGps.push(p.gps);}));
+  if(coords&&photoGps.length&&photoGps.some(g=>haversine(g,coords)>LOC_THRESHOLD_KM))locFlag=true;
+  const now=new Date();
+  const devNew=checkDevice(), dev=deviceLabel(), devId=deviceId();
+  const lateDays=reportDate?Math.max(0,Math.round((new Date(todayKey())-new Date(effDateKey()))/86400000)):0;
+  // ค่าตอบแทนอิงสถานที่ (ไขว้เขตได้)
+  const r=resolveHos(hname);
+  let allowanceType,travel,area,period='';
+  if(r&&r.mode==='ค่าจุด'){allowanceType='ค่าจุด';travel=r.travel;area=r.area;period=perDiemPeriod;}
+  else if(r&&r.mode==='ฐาน'){allowanceType='ฐาน';travel=0;area=r.province;}
+  else if(r&&r.mode==='เบี้ยเลี้ยง'){allowanceType='เบี้ยเลี้ยง';travel=perDiemAmt;area=r.province;period=perDiemPeriod;}
+  else{ // นอกรายการ (พิมพ์เอง) → ใช้จังหวัดที่เลือก
+    const prov=($('#typedProv').value||'').trim();const base=(window.TCJ_HOME||{})[currentTech.name]||[];const isBkkTech=techRegion(currentTech)==='กทม./ปริมณฑล';
+    if(prov&&base.indexOf(prov)>=0){allowanceType='ฐาน';travel=0;area=prov;}
+    else if(isBkkTech&&(!prov||prov==='กทม')){allowanceType='ค่าจุด';travel=75;area=prov||'กทม.';period=perDiemPeriod;}
+    else if(isBkkTech&&PARIMONTHON.indexOf(prov)>=0){allowanceType='ค่าจุด (รอพิจารณา)';travel=0;area=prov;period=perDiemPeriod;}
+    else{allowanceType='เบี้ยเลี้ยง';travel=perDiemAmt;area=prov||'ต่างจังหวัด';period=perDiemPeriod;}
+  }
+  const holiday=isHolidayDate();const hc=holiday?holidayCalc():{bonus:0,ot:false};
+  const base={dateKey:effDateKey(),dateTh:effDateTh(),pin:currentTech.pin,tech:currentTech.name,vehicle:currentTech.vehicle||'',region:techRegion(currentTech),lineId:currentTech.lineId||'',hospital:hname,
+    area:area,travel:travel,allowanceType:allowanceType,period:period,perDiem:allowanceType==='เบี้ยเลี้ยง'&&travel>0,
+    isHoliday:holiday,holidayBonus:hc.bonus,ot:hc.ot,
+    late:!!reportDate,lateDays:lateDays,
+    gps:gps,device:dev,deviceId:devId};
+  const recs=sel.map(s=>{
+    const defer=s.code==='G1'&&s.defer;let deadline='';if(defer){const dd=new Date(now);dd.setDate(dd.getDate()+DOC_GRACE_DAYS);deadline=dd.toISOString();}
+    const pf={};s.photos.forEach(p=>(p.flags||[]).forEach(f=>pf[f]=1));if(locFlag)pf['พิกัดไม่ตรง']=1;if(devNew)pf['อุปกรณ์ใหม่']=1;if(reportDate)pf['ส่งสาย '+lateDays+' วัน']=1;if(allowanceType==='ค่าจุด (รอพิจารณา)')pf['รอพิจารณาค่าจุด']=1;
+    const pGps=(s.photos.find(p=>p.gps)||{}).gps;
+    return Object.assign({},base,{id:Date.now()+'_'+s.code+'_'+Math.random().toString(36).slice(2,6),code:s.code,label:(s.desc&&s.desc.trim())?(s.label+' — '+s.desc.trim()):s.label,desc:s.desc||'',points:s.pt,note:s.note,
+      photoCount:s.photos.length,photoGps:pGps?(pGps.lat+', '+pGps.lng):'',flags:Object.keys(pf),status:defer?'รอเอกสาร':'รอตรวจ',docDeadline:deadline,ts:now.toISOString()});
+  });
+  const all=getReports();recs.forEach(r=>all.push(r));saveReports(all);
+  const hs=submittedHashes();sel.forEach(s=>s.photos.forEach(p=>hs.push(p.hash)));localStorage.setItem('kosin_hashes',JSON.stringify(hs));
+  learnCoords(hname,photoGps[0]);
+  if(SUBMIT_URL)sel.forEach((s,i)=>{fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify(Object.assign({},recs[i],{photos:s.photos.map(p=>p.data)}))}).catch(()=>{});});
+  showOk(recs,h,all);
+}
+$('#sendBtn').onclick=()=>{doSubmit();};
+function showOk(recs,h,all){
+  $('#scrApp').classList.add('hidden');$('#scrOk').classList.remove('hidden');
+  const totPh=recs.reduce((a,r)=>a+r.photoCount,0);
+  const defer=recs.some(r=>r.status==='รอเอกสาร');const flags=recs.some(r=>r.flags&&r.flags.length);
+  $('#okSub').textContent=defer?('มีงานรอแนบใบ maintenance ภายใน '+DOC_GRACE_DAYS+' วัน'):(flags?'ส่งแล้ว — มีบางงานติดธงให้หัวหน้าตรวจเพิ่ม':'รอหัวหน้าตรวจอนุมัติ');
+  const list=recs.map(r=>'• '+r.code+' '+r.label+(r.status==='รอเอกสาร'?' — รอเอกสาร':'')+((r.flags&&r.flags.length)?' ⚑':'')).join('<br>');
+  $('#okSumm').innerHTML='<div class="r"><span>ช่าง</span><span>'+recs[0].tech+'</span></div><div class="r"><span>สถานที่</span><span>'+recs[0].hospital+'</span></div><div class="tasks" style="padding:8px 0">'+list+'</div><div class="r"><span>รวม</span><span>'+recs.length+' งาน · '+totPh+' รูป</span></div>';
+  const mine=all.filter(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.dateKey===todayKey());
+  $('#todayCount').textContent='วันนี้คุณรายงานแล้ว '+mine.length+' งาน';
+}
+$('#againBtn').onclick=()=>{$('#scrOk').classList.add('hidden');$('#scrApp').classList.remove('hidden');switchTab('report');resetForm();};
+function goLogin(){currentTech=null;$('#scrOk').classList.add('hidden');$('#scrApp').classList.add('hidden');$('#scrLogin').classList.remove('hidden');buildLogin();}
+$('#logoutBtn').onclick=goLogin;
+$('#backBtn').onclick=()=>{
+  if(Object.keys(selected).length){
+    showModal({icon:'<i class="ti ti-arrow-back-up"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'กลับไปเลือกชื่อ?',body:'งานที่กรอกค้างไว้จะหาย ยืนยันไหมคะ',buttons:[{label:'กลับไปเลือกชื่อ',val:'go',cls:'pri'},{label:'อยู่ต่อ',val:'stay'}]}).then(a=>{if(a.val==='go')goLogin();});
+  }else goLogin();
+};
+
+/* ===== MY SCORE ===== */
+function statusBadge(st){if(st==='ผ่าน')return'<span class="badge st-ok">ผ่าน</span>';if(st==='ไม่ผ่าน')return'<span class="badge st-no">ไม่ผ่าน</span>';if(st==='รอเอกสาร')return'<span class="badge st-wait">รอเอกสาร</span>';if(st==='รออนุมัติย้อนหลัง')return'<span class="badge st-wait">รออนุมัติย้อนหลัง</span>';return'<span class="badge st-wait">รอตรวจ</span>';}
+function daysLeft(iso){return Math.ceil((new Date(iso)-new Date())/86400000);}
+function renderScore(){
+  const recs=myRecs();
+  const cPass=recs.filter(r=>r.status==='ผ่าน').length,cWait=recs.filter(r=>r.status==='รอตรวจ').length,cNo=recs.filter(r=>r.status==='ไม่ผ่าน').length;
+  const docs=recs.filter(r=>r.status==='รอเอกสาร');
+  const mon=todayKey().slice(0,7);
+  const cjSeen={};let cjMonth=0;
+  recs.filter(r=>r.dateKey.slice(0,7)===mon&&r.allowanceType!=='เบี้ยเลี้ยง').forEach(r=>{const k=r.dateKey+'|'+r.hospital;if(!cjSeen[k]){cjSeen[k]=1;cjMonth+=(+r.travel||0);}});
+  const bDays={};recs.filter(r=>r.dateKey.slice(0,7)===mon&&r.allowanceType==='เบี้ยเลี้ยง').forEach(r=>{bDays[r.dateKey]=Math.min(250,(bDays[r.dateKey]||0)+(+r.travel||0));});
+  const bMonth=Object.values(bDays).reduce((a,b)=>a+b,0);
+  let h='<div class="bighead" style="display:flex;gap:8px;text-align:center">'+
+    '<div style="flex:1"><div class="t">ค่าจุดเดือนนี้</div><div class="n">'+cjMonth.toLocaleString()+'</div><div class="t">บาท</div></div>'+
+    '<div style="width:1px;background:var(--brand-tintborder)"></div>'+
+    '<div style="flex:1"><div class="t">เบี้ยเลี้ยงเดือนนี้</div><div class="n">'+bMonth.toLocaleString()+'</div><div class="t">บาท</div></div>'+
+  '</div>';
+  h+='<div style="font-size:11px;color:var(--amber);background:var(--amber-bg);border-radius:9px;padding:8px 11px;margin-bottom:12px">⚠️ ตัวเลขค่าจุด/เบี้ยเลี้ยงยังไม่ยืนยัน — รอตรวจสอบจากหน่วยงานที่เกี่ยวข้องก่อนเบิกจ่าย</div>';
+  h+='<div class="stchips"><span class="st-ok">ผ่าน '+cPass+'</span><span class="st-wait">รอตรวจ '+cWait+'</span><span class="st-no">ไม่ผ่าน '+cNo+'</span></div>';
+  const hbDays={};recs.filter(r=>r.dateKey.slice(0,7)===mon&&r.holidayBonus>0).forEach(r=>hbDays[r.dateKey]=Math.max(hbDays[r.dateKey]||0,+r.holidayBonus||0));
+  const holBonus=Object.values(hbDays).reduce((a,b)=>a+b,0);
+  const otDays=[...new Set(recs.filter(r=>r.dateKey.slice(0,7)===mon&&r.ot).map(r=>r.dateKey))].length;
+  if(holBonus>0||otDays>0)h+='<div style="background:var(--danger-bg);color:var(--danger);border-radius:9px;padding:8px 11px;margin-bottom:12px;font-size:11.5px">🌴 วันหยุดเดือนนี้: '+(holBonus>0?('ค่า Workshop วันหยุด '+holBonus.toLocaleString()+' บาท'):'')+(holBonus>0&&otDays>0?' · ':'')+(otDays>0?('OT '+otDays+' วัน (เบิกแยก)'):'')+'</div>';
+  if(docs.length){h+='<div class="sechead">⏳ รอแนบใบ maintenance ('+docs.length+')</div>';docs.forEach(r=>{const dl=r.docDeadline?daysLeft(r.docDeadline):DOC_GRACE_DAYS;const cls=dl<=2?'st-no':'st-wait';h+='<div class="docbox"><div class="r1"><span class="nm">'+r.code+' · '+r.label+'</span><span class="badge '+cls+'">เหลือ '+(dl<0?0:dl)+' วัน</span></div><div class="meta">'+r.dateTh+' · '+r.hospital+' (รอเอกสาร)</div><div class="docbtn" data-doc="'+r.id+'">📷 แนบใบ maintenance</div></div>';});}
+  h+='<div class="sechead" style="margin-top:6px">งานล่าสุด</div>';
+  const recent=recs.slice().reverse().slice(0,15);
+  if(!recent.length)h+='<div style="font-size:12.5px;color:var(--mut);text-align:center;padding:20px">ยังไม่มีงานที่รายงาน</div>';
+  recent.forEach(r=>{const fl=(r.flags&&r.flags.length)?'<span class="flagtag">⚑ '+r.flags.join(', ')+'</span>':'';h+='<div class="rec"><div class="r1"><span class="nm">'+r.code+' · '+r.label+fl+'</span>'+statusBadge(r.status)+'</div><div class="meta">'+r.dateTh+' · '+r.hospital+(r.note?(' · '+r.note):'')+'</div></div>';});
+  h+='<div style="font-size:10.5px;color:var(--mut);text-align:center;margin-top:12px">แสดงค่าจุด/เบี้ยเลี้ยง (นับที่หัวหน้าอนุมัติ)'+(SUBMIT_URL?'':' · โหมดทดลอง')+'</div>';
+  $('#scoreBody').innerHTML=h;
+  $$('#scoreBody [data-doc]').forEach(b=>b.onclick=()=>{docRecId=b.getAttribute('data-doc');activeCode=null;$('#photoInput').click();});
+}
+function completeDoc(id){const all=getReports();const r=all.find(x=>x.id===id);if(r){r.status='รอตรวจ';r.docDeadline='';r.photoCount=(r.photoCount||0)+1;saveReports(all);}renderScore();if(SUBMIT_URL)fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'adddoc',id:id})}).catch(()=>{});}
+
+function refreshMaster(){window.__kosinData=function(d){if(d&&d.hospitals&&d.hospitals.length)window.HOSPITALS=d.hospitals;if(d&&d.technicians&&d.technicians.length){window.TECHNICIANS=d.technicians;buildLogin();}};const s=document.createElement('script');s.src=SUBMIT_URL+(SUBMIT_URL.indexOf('?')<0?'?':'&')+'list=1&callback=__kosinData';s.onerror=function(){};document.body.appendChild(s);}
+/* ===== แพลนงานสัปดาห์ (อา–ส) + สรุปแผน vs จริง ===== */
+const THAI_DOW=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+/* ปฏิทินบริษัท ก.ค.–ธ.ค. 2569 (2026) — ขึ้นปีใหม่ต้องอัปเดต */
+const HOLIDAYS={'2026-07-28':'วันเกิด ร.10','2026-07-29':'วันอาสาฬหบูชา','2026-08-12':'วันแม่','2026-10-13':'วันสวรรคต ร.9','2026-10-23':'วันปิยมหาราช','2026-12-07':'ชดเชยวันพ่อ','2026-12-10':'วันรัฐธรรมนูญ','2026-12-31':'วันสิ้นปี'};
+const WORK_SAT={'2026-07-04':1,'2026-08-01':1,'2026-09-05':1,'2026-10-03':1,'2026-11-07':1,'2026-12-12':1};
+const WORK_5S={'2026-08-22':'ทำ 5ส','2026-12-19':'ทำ 5ส'};
+function dayInfo(dk){
+  if(HOLIDAYS[dk])return{off:true,name:HOLIDAYS[dk]};
+  if(WORK_SAT[dk])return{off:false,name:'เสาร์ประชุม',special:true};
+  if(WORK_5S[dk])return{off:false,name:WORK_5S[dk],special:true};
+  const g=new Date(dk+'T00:00:00').getDay();
+  if(g===0)return{off:true,name:'วันอาทิตย์'};
+  if(g===6)return{off:true,name:'วันเสาร์'};
+  return{off:false,name:''};
+}
+/* เงินวันหยุด: ออกร้าน/workshop +600 · งานอื่น = ปกติ + OT (ยกเว้น Sale Engineer) */
+const BOOTH_CODES=['B2','B3a','B3b','B3c'];
+const NO_OT_TECH='เกียรติศักดิ์ ชมชื่น';
+const PARIMONTHON=['นนทบุรี','ปทุมธานี','สมุทรปราการ','สมุทรสาคร','นครปฐม'];  // ช่าง กทม. ที่ปริมณฑล = ค่าจุด 100
+function isBkkArea(prov){return prov==='กทม'||PARIMONTHON.indexOf(prov)>=0;}
+let boothFull=true;
+function isHolidayDate(){return currentTech?dayInfo(effDateKey()).off:false;}
+function holidayCalc(){
+  const sel=Object.values(selected);
+  const hasBooth=sel.some(s=>BOOTH_CODES.indexOf(s.code)>=0);
+  const hasOther=sel.some(s=>BOOTH_CODES.indexOf(s.code)<0);
+  return{bonus:hasBooth?(boothFull?600:300):0, hasBooth:hasBooth, ot:hasOther&&currentTech.name!==NO_OT_TECH};
+}
+let planWeek=null, planView='month', planMonth=null;
+function sundayStart(d){d=d?new Date(d):new Date();d.setDate(d.getDate()-d.getDay());return dkey(d);}
+function viewToggleHtml(active){return '<div style="display:flex;gap:6px;margin-bottom:10px"><button class="tab'+(active==='week'?' on':'')+'" data-view="week" style="flex:1">รายสัปดาห์</button><button class="tab'+(active==='month'?' on':'')+'" data-view="month" style="flex:1">ปฏิทินเดือน</button></div>';}
+function bindViewToggle(){$$('#planBody [data-view]').forEach(b=>b.onclick=()=>{planView=b.dataset.view;renderPlan();});}
+function renderPlanMonth(){
+  if(!planMonth){const d=new Date();planMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';}
+  const first=new Date(planMonth+'T00:00:00'),y=first.getFullYear(),mo=first.getMonth();
+  const MN=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const mine=(loadPlans()[currentTech.name])||{};const byDate={};
+  Object.keys(mine).forEach(ws=>{const wk=mine[ws];Object.keys(wk).forEach(dk=>{const c=['เช้า','บ่าย'].filter(s=>wk[dk][s]&&wk[dk][s].hospital).length;if(c)byDate[dk]=c;});});
+  let h='';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><button class="btn" style="width:auto;padding:9px 13px" data-mnav="-1">◄</button><div style="flex:1;text-align:center;font-size:14px;font-weight:600">'+MN[mo]+' '+((y+543)%100)+'</div><button class="btn" style="width:auto;padding:9px 13px" data-mnav="1">►</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;font-size:10px;color:var(--mut);margin-bottom:3px">'+['อา','จ','อ','พ','พฤ','ศ','ส'].map(d=>'<div>'+d+'</div>').join('')+'</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">';
+  const startDow=first.getDay(),daysIn=new Date(y,mo+1,0).getDate();
+  for(let i=0;i<startDow;i++)h+='<div></div>';
+  const tk=todayKey();
+  for(let dn=1;dn<=daysIn;dn++){const dk=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(dn).padStart(2,'0');const di=dayInfo(dk),c=byDate[dk]||0;
+    const bg=di.off?'background:var(--danger-bg)':(c?'background:var(--brand-tint)':'background:var(--card)');
+    h+='<div class="mcell" data-dk="'+dk+'" style="cursor:pointer;border:'+(dk===tk?'1.5px solid var(--green)':'0.5px solid var(--line)')+';border-radius:8px;min-height:46px;padding:3px;'+bg+'"><div style="font-size:11px;font-weight:500;'+(di.off?'color:var(--danger)':'')+'">'+dn+'</div>'+(c?'<div style="font-size:9px;color:var(--brand-dark);margin-top:2px">📍'+c+'</div>':'')+'</div>';
+  }
+  h+='</div><div style="font-size:10.5px;color:var(--mut);margin-top:10px;text-align:center">แตะวันเพื่อดู/แก้แพลน · 🟧 มีแพลน · 🟥 วันหยุด</div>';
+  $('#planBody').innerHTML=h;
+  $$('#planBody [data-mnav]').forEach(b=>b.onclick=()=>{const d=new Date(planMonth+'T00:00:00');d.setMonth(d.getMonth()+parseInt(b.dataset.mnav));planMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';renderPlan();});
+  $$('#planBody .mcell').forEach(el=>el.onclick=()=>{planWeek=sundayStart(el.dataset.dk);planView='week';renderPlan();});
+}
+function loadPlans(){try{return JSON.parse(localStorage.getItem('kosin_plans')||'{}')}catch(e){return{}}}
+function savePlans(p){localStorage.setItem('kosin_plans',JSON.stringify(p));}
+function myPlan(ws){const a=loadPlans();return (a[currentTech.name]&&a[currentTech.name][ws])||{};}
+function setPlanSlot(ws,dk,slot,val){const a=loadPlans();a[currentTech.name]=a[currentTech.name]||{};a[currentTech.name][ws]=a[currentTech.name][ws]||{};a[currentTech.name][ws][dk]=a[currentTech.name][ws][dk]||{};if(val)a[currentTech.name][ws][dk][slot]=val;else{delete a[currentTech.name][ws][dk][slot];if(!Object.keys(a[currentTech.name][ws][dk]).length)delete a[currentTech.name][ws][dk];}savePlans(a);if(SUBMIT_URL)fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'plan',tech:currentTech.name,weekStart:ws,plan:myPlan(ws)})}).catch(()=>{});}
+function fmtD(d){const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return d.getDate()+' '+m[d.getMonth()];}
+function upcomingItems(){
+  const mine=(loadPlans()[currentTech.name])||{};const today=todayKey();const items=[];
+  Object.keys(mine).forEach(ws=>{const wk=mine[ws];Object.keys(wk).forEach(dk=>{if(dk>=today)['เช้า','บ่าย'].forEach(slot=>{const e=wk[dk][slot];if(e&&e.hospital)items.push({dk:dk,slot:slot,hospital:e.hospital,detail:e.detail});});});});
+  items.sort((a,b)=>a.dk<b.dk?-1:(a.dk>b.dk?1:(a.slot==='เช้า'?-1:1)));return items;
+}
+function upcomingPlansHtml(){
+  const items=upcomingItems();if(!items.length)return '<div style="font-size:12px;color:var(--mut);text-align:center;padding:12px">ยังไม่มีแพลนล่วงหน้า</div>';
+  let h='';items.forEach(it=>{h+='<div class="rec"><div class="r1"><span class="nm">📍 '+it.hospital+'</span><span class="badge st-wait">'+it.slot+'</span></div><div class="meta">'+thFromKey(it.dk)+(it.detail?' · '+it.detail:'')+'</div></div>';});return h;
+}
+function loadPlanMeta(){try{return JSON.parse(localStorage.getItem('kosin_planmeta')||'{}')}catch(e){return{}}}
+function planMeta(ws){const m=loadPlanMeta();return (m[currentTech.name]&&m[currentTech.name][ws])||{changes:0,log:[]};}
+function logPlanChange(ws,dk,slot,reason){const m=loadPlanMeta();m[currentTech.name]=m[currentTech.name]||{};m[currentTech.name][ws]=m[currentTech.name][ws]||{changes:0,log:[]};m[currentTech.name][ws].changes++;m[currentTech.name][ws].log.push({ts:new Date().toISOString(),dk:dk,slot:slot,reason:reason||''});localStorage.setItem('kosin_planmeta',JSON.stringify(m));
+  if(SUBMIT_URL)fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'planchange',tech:currentTech.name,weekStart:ws,dateKey:dk,slot:slot,reason:reason||''})}).catch(()=>{});}
+function renderPlan(){
+  if(planView==='month')return renderPlanMonth();
+  if(!planWeek)planWeek=sundayStart();
+  const ws=planWeek, wsD=new Date(ws+'T00:00:00'), wEnd=new Date(wsD);wEnd.setDate(wEnd.getDate()+6);
+  const thisWs=sundayStart(), plan=myPlan(ws);
+  let h='<button class="btn" id="backToCal" style="margin-bottom:8px">‹ กลับปฏิทินเดือน</button>'+'<button class="btn" id="upcomingBtn" style="margin-bottom:8px">📌 แพลนล่วงหน้าทั้งหมด ('+upcomingItems().length+')</button>'+
+    '<div id="upcomingBox" class="hidden" style="margin-bottom:10px">'+upcomingPlansHtml()+'</div>'+
+    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><span style="font-size:11px;color:var(--mut);white-space:nowrap">📅 ไปวันที่:</span><input type="date" id="planJump" class="field" style="flex:1;padding:8px 10px"></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+    '<button class="btn" style="width:auto;padding:9px 13px" data-nav="-1">◄</button>'+
+    '<div style="flex:1;text-align:center"><div style="font-size:13px;font-weight:600">'+fmtD(wsD)+' – '+fmtD(wEnd)+'</div><div style="font-size:11px;color:var(--mut)">'+(ws===thisWs?'สัปดาห์นี้':(ws>thisWs?'สัปดาห์หน้า':'ผ่านมาแล้ว'))+'</div></div>'+
+    '<button class="btn" style="width:auto;padding:9px 13px" data-nav="1">►</button></div>';
+  if(ws>=thisWs)h+='<div style="display:flex;gap:7px;align-items:center;background:var(--amber-bg);color:var(--amber);border-radius:9px;padding:8px 11px;margin-bottom:10px;font-size:11.5px">⏰ ส่งแพลนภายในเสาร์ก่อนเที่ยงคืน · แก้ได้ตลอดสัปดาห์</div>';
+  for(let i=0;i<7;i++){const dd=new Date(wsD);dd.setDate(dd.getDate()+i);const dk=dkey(dd);const di=dayInfo(dk);
+    const badge=di.off?'<span style="font-size:10px;background:var(--danger-bg);color:var(--danger);padding:1px 7px;border-radius:20px;margin-left:6px">🌴 '+di.name+'</span>':(di.special?'<span style="font-size:10px;background:var(--accent-bg);color:var(--accent);padding:1px 7px;border-radius:20px;margin-left:6px">💼 '+di.name+'</span>':'');
+    h+='<div class="card" style="padding:9px 12px;margin-bottom:7px'+(di.off?';opacity:.7':'')+'"><div style="font-size:12.5px;font-weight:600;margin-bottom:2px">'+THAI_DOW[i]+' '+dd.getDate()+badge+'</div>';
+    ['เช้า','บ่าย'].forEach(slot=>{const e=(plan[dk]||{})[slot];
+      h+='<div class="planslot" data-dk="'+dk+'" data-slot="'+slot+'" style="display:flex;align-items:center;gap:8px;padding:7px 2px;cursor:pointer;border-top:0.5px dashed var(--line)"><span style="font-size:11px;color:var(--mut);width:30px">'+slot+'</span>'+(e?'<span style="flex:1;font-size:12px">📍 '+e.hospital+(e.detail?' · <span style="color:var(--mut)">'+e.detail+'</span>':'')+'</span><i class="ti ti-pencil" style="color:var(--mut2);font-size:14px"></i>':'<span style="flex:1;font-size:12px;color:var(--accent)">＋ เพิ่ม รพ.</span>')+'</div>';
+    });
+    h+='</div>';
+  }
+  h+=planSummaryHtml(ws);
+  $('#planBody').innerHTML=h;
+  $$('#planBody [data-nav]').forEach(b=>b.onclick=()=>{const dd=new Date(ws+'T00:00:00');dd.setDate(dd.getDate()+7*parseInt(b.dataset.nav));planWeek=dkey(dd);renderPlan();});
+  $$('#planBody .planslot').forEach(el=>el.onclick=()=>editPlanSlot(ws,el.dataset.dk,el.dataset.slot));
+  const ub=$('#upcomingBtn');if(ub)ub.onclick=()=>$('#upcomingBox').classList.toggle('hidden');
+  const pj=$('#planJump');if(pj)pj.onchange=()=>{if(pj.value){planWeek=sundayStart(pj.value);renderPlan();}};
+  const bc=$('#backToCal');if(bc)bc.onclick=()=>{planView='month';renderPlan();};
+}
+function editPlanSlot(ws,dk,slot){
+  const cur=(myPlan(ws)[dk]||{})[slot]||{};const isChange=!!cur.hospital;
+  const host=$('#modalHost');const ov=document.createElement('div');ov.className='ov';
+  const reasonHtml=isChange?'<div style="font-size:11px;color:var(--amber);text-align:left;margin:2px 0 6px">เปลี่ยนจากเดิม? แจ้งเหตุผล (หัวหน้าเห็น)</div><select id="plReason" style="margin-bottom:8px"><option value="">— เหตุผลที่เปลี่ยน —</option><option>ลูกค้าเรียกด่วน</option><option>งานเลื่อน</option><option>ป่วย</option><option>อื่นๆ</option></select><input id="plReasonOther" placeholder="ระบุเหตุผลอื่นๆ" style="display:none">':'';
+  ov.innerHTML='<div class="modal"><h3>แพลน '+slot+'</h3><p>'+thFromKey(dk)+'</p><input id="plHos" list="hosList" placeholder="เลือก/พิมพ์ ชื่อ รพ."><input id="plDetail" placeholder="รายละเอียดงาน (ถ้ามี)">'+reasonHtml+'<div class="mb"><button class="mbtn pri" id="plSave">บันทึก</button>'+(isChange?'<button class="mbtn" id="plClear">ลบแผนช่องนี้</button>':'')+'<button class="mbtn" id="plCancel">ยกเลิก</button></div></div>';
+  host.appendChild(ov);
+  ov.querySelector('#plHos').value=cur.hospital||'';ov.querySelector('#plDetail').value=cur.detail||'';
+  const rs=ov.querySelector('#plReason');if(rs)rs.onchange=()=>{ov.querySelector('#plReasonOther').style.display=rs.value==='อื่นๆ'?'block':'none';};
+  function reasonVal(){if(!rs)return'';let v=rs.value;if(v==='อื่นๆ')v=ov.querySelector('#plReasonOther').value.trim()||'อื่นๆ';return v;}
+  ov.querySelector('#plCancel').onclick=()=>host.removeChild(ov);
+  const cl=ov.querySelector('#plClear');if(cl)cl.onclick=()=>{setPlanSlot(ws,dk,slot,null);logPlanChange(ws,dk,slot,'ลบแผน'+(reasonVal()?' · '+reasonVal():''));host.removeChild(ov);renderPlan();};
+  ov.querySelector('#plSave').onclick=()=>{const hos=ov.querySelector('#plHos').value.trim();if(!hos){ov.querySelector('#plHos').focus();return;}
+    const changed=isChange&&(hos!==cur.hospital||ov.querySelector('#plDetail').value.trim()!==(cur.detail||''));
+    setPlanSlot(ws,dk,slot,{hospital:hos,detail:ov.querySelector('#plDetail').value.trim()});
+    if(changed)logPlanChange(ws,dk,slot,reasonVal());
+    host.removeChild(ov);renderPlan();};
+}
+function planSummaryHtml(ws){
+  const plan=myPlan(ws), wsD=new Date(ws+'T00:00:00');const ee=new Date(wsD);ee.setDate(ee.getDate()+6);const wEndK=dkey(ee);
+  const planned=[];Object.keys(plan).forEach(dk=>['เช้า','บ่าย'].forEach(s=>{const x=plan[dk][s];if(x&&x.hospital)planned.push(dk+'|'+x.hospital);}));
+  const plannedKeys=[];planned.forEach(k=>{if(plannedKeys.indexOf(k)<0)plannedKeys.push(k);});
+  const recs=myRecs().filter(r=>r.dateKey>=ws&&r.dateKey<=wEndK);
+  const actual={};recs.forEach(r=>actual[r.dateKey+'|'+r.hospital]=1);
+  let match=0;const rows=[];
+  plannedKeys.forEach(k=>{const done=actual[k];if(done)match++;const p=k.split('|');rows.push([p[1],p[0],done?'ตรงแพลน':'ไม่ได้ไป']);});
+  Object.keys(actual).forEach(k=>{if(plannedKeys.indexOf(k)<0){const p=k.split('|');rows.push([p[1],p[0],'นอกแพลน']);}});
+  const meta=planMeta(ws);
+  const changeFlag=meta.changes>0?'<div style="display:flex;gap:7px;align-items:flex-start;background:var(--amber-bg);color:var(--amber);border-radius:9px;padding:8px 11px;margin-bottom:8px;font-size:11.5px">🚩 <div>แก้แพลนสัปดาห์นี้ <b>'+meta.changes+' ครั้ง</b>'+(meta.log.length&&meta.log[meta.log.length-1].reason?(' · ล่าสุด: '+meta.log[meta.log.length-1].reason):'')+'</div></div>':'';
+  if(!plannedKeys.length&&!rows.length)return '<div class="sechead" style="margin-top:12px">สรุปแผน vs งานจริง</div>'+changeFlag+'<div style="font-size:12.5px;color:var(--mut);text-align:center;padding:16px">ยังไม่มีแพลนสัปดาห์นี้</div>';
+  const pct=plannedKeys.length?Math.round(match/plannedKeys.length*100):0;
+  let s='<div class="sechead" style="margin-top:12px">สรุปแผน vs งานจริง</div>'+changeFlag;
+  s+='<div class="bighead" style="text-align:center"><div class="t">ทำตามแพลน</div><div class="n">'+pct+'%</div><div class="t">'+match+' จาก '+plannedKeys.length+' ที่แพลนไว้</div></div>';
+  const bd=t=>t==='ตรงแพลน'?'<span class="badge st-ok">ตรงแพลน</span>':(t==='ไม่ได้ไป'?'<span class="badge st-no">แพลนแต่ไม่ได้ไป</span>':'<span class="badge st-wait">นอกแพลน</span>');
+  rows.forEach(r=>{s+='<div class="rec"><div class="r1"><span class="nm">'+r[0]+'</span>'+bd(r[2])+'</div><div class="meta">'+thFromKey(r[1])+'</div></div>';});
+  return s;
+}
+
+applyTheme();
+buildLogin();
+initLiff();
+if(SUBMIT_URL)refreshMaster();
+</script>
+</body>
+</html>
