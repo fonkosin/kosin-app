@@ -8,6 +8,12 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>รายงานงานช่าง · KOSIN</title>
+<link rel="icon" href="favicon-32.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F5620F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KOSIN ช่าง">
 <style>
   :root{--green:#F5620F;--green-dk:#ffffff;--green-mid:#ffd9c2;--brand-tint:#FFF0E6;--brand-tintbg:#fff4ec;--brand-tintborder:#f5cba3;--brand-dark:#b34205;--bg:#f5f4f2;--card:#fff;--line:#e6e4e0;--line2:#d3d0ca;
     --txt:#1a1d21;--mut:#6b7280;--mut2:#9aa0a8;--accent:#185FA5;--accent-bg:#E6F1FB;--danger:#A32D2D;--danger-bg:#FCEBEB;
@@ -199,7 +205,7 @@
           <button class="send" id="sendBtn" style="flex:1" disabled>ส่งรายงาน</button>
         </div>
       </div>
-      <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden" multiple>
+      <input type="file" id="photoInput" accept="image/*" class="hidden" multiple>
     </div>
     <div id="tabPlan" class="hidden"><div class="body" id="planBody"></div></div>
   </section>
@@ -453,12 +459,16 @@ $('#tabBtnReport').onclick=()=>switchTab('report');
 $('#tabBtnPlan').onclick=()=>switchTab('plan');
 
 /* ===== REPORT ===== */
+function lastHosMap(){try{return JSON.parse(localStorage.getItem('kosin_lasthos')||'{}')}catch(e){return{}}}
+function getLastHos(){return lastHosMap()[currentTech.name]||'';}
+function saveLastHos(name){if(!name)return;const m=lastHosMap();m[currentTech.name]=name;localStorage.setItem('kosin_lasthos',JSON.stringify(m));}
 function resetForm(){
   $('#today').textContent=todayStr();clearBackdate();buildTasks();
-  $('#hosInput').value='';$('#hosInfo').classList.add('hidden');$('#hosFree').classList.add('hidden');$('#dupWarn').innerHTML='';$('#typedProv').value='';$('#typedProvBox').classList.add('hidden');
+  $('#hosInput').value=getLastHos();$('#hosInfo').classList.add('hidden');$('#hosFree').classList.add('hidden');$('#dupWarn').innerHTML='';$('#typedProv').value='';$('#typedProvBox').classList.add('hidden');
   $('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='—';gps='';selected={};
   perDiemPeriod='ทั้งวัน';perDiemAmt=250;boothFull=true;$('#pdCard').classList.add('hidden');$('#boothCtrl').classList.add('hidden');
   $('#hosInput').placeholder='เลือก/พิมพ์ชื่อ รพ. (ที่ไหนก็ได้ ข้ามเขตได้)';
+  if($('#hosInput').value)applyHos();
   window.scrollTo(0,0);recalc();
 }
 function buildTasks(){
@@ -634,6 +644,7 @@ async function doSubmit(){
   const hname=$('#hosInput').value.trim();if(!hname)return;
   const h=currentHos();const sel=Object.values(selected);if(!sel.length)return;
   if(sel.some(s=>s.photos.length===0))return;
+  saveLastHos(hname);
   // เช็คพิกัดจากรูปเทียบสถานที่แบบเงียบ ๆ — ไม่เตือนช่าง แค่ติดธงให้หลังบ้าน
   let locFlag=false;
   const coords=hosCoords(hname);
