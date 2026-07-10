@@ -355,6 +355,7 @@ function parseExif(buf){
     return{gps:null,taken:null};
   }catch(e){return{gps:null,taken:null};}
 }
+function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('หมดเวลา')),ms))]);}
 function blobToDataURL(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=()=>rej(f.error||new Error('อ่านไฟล์ไม่สำเร็จ'));f.readAsDataURL(b);});}
 function resizeImageBlob(file,maxDim,quality){
   return new Promise((resolve,reject)=>{
@@ -590,8 +591,8 @@ async function addPhotos(files,code){
       let buf=null;try{buf=await f.arrayBuffer();}catch(e){}
       const exif=buf?parseExif(buf):{gps:null,taken:null};
       let data;
-      try{ data=await resizeImageBlob(f,1600,0.72); }
-      catch(resizeErr){ data=await blobToDataURL(f); } // ย่อไม่ได้ (ฟอร์แมต/ขนาดที่เบราว์เซอร์ถอดไม่ออก) → ใช้รูปต้นฉบับแทน ไม่ให้ล้มเหลว
+      try{ data=await withTimeout(resizeImageBlob(f,1600,0.72),9000); }
+      catch(resizeErr){ data=await withTimeout(blobToDataURL(f),9000); } // ย่อไม่ได้/ค้าง (ฟอร์แมต/ขนาดที่เบราว์เซอร์ถอดไม่ออก) → ใช้รูปต้นฉบับแทน ไม่ให้ล้มเหลว
       const hash=simpleHash(data);const flags=[];
       if(!exif.gps)flags.push('ไม่มีพิกัด');
       if(exif.taken&&dayDiff(exif.taken,todayKey())>ALLOW_DAYS)flags.push('รูปเก่า');
