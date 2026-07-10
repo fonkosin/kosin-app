@@ -352,7 +352,28 @@ function parseExif(buf){
     return{gps:null,taken:null};
   }catch(e){return{gps:null,taken:null};}
 }
-function blobToDataURL(b){return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b);});}
+function blobToDataURL(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=()=>rej(f.error||new Error('อ่านไฟล์ไม่สำเร็จ'));f.readAsDataURL(b);});}
+function resizeImageBlob(file,maxDim,quality){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    const done=(v)=>{URL.revokeObjectURL(url);resolve(v);};
+    const fail=(e)=>{URL.revokeObjectURL(url);reject(e||new Error('โหลดรูปไม่สำเร็จ'));};
+    img.onload=()=>{
+      try{
+        let w=img.naturalWidth,h=img.naturalHeight;
+        if(!w||!h){fail();return;}
+        if(w>h){if(w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}}
+        else{if(h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}}
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+        done(canvas.toDataURL('image/jpeg',quality));
+      }catch(e){fail(e);}
+    };
+    img.onerror=fail;
+    img.src=url;
+  });
+}
 function simpleHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return 'h'+h.toString(16)+'_'+s.length;}
 function haversine(a,b){const R=6371,dLa=(b.lat-a.lat)*Math.PI/180,dLo=(b.lng-a.lng)*Math.PI/180,la1=a.lat*Math.PI/180,la2=b.lat*Math.PI/180;const x=Math.sin(dLa/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
 function dayDiff(a,b){return Math.abs((new Date(b)-new Date(a))/86400000);}
@@ -518,23 +539,35 @@ function renderPhotos(code){
 }
 async function addPhotos(files,code){
   const arr=selected[code].photos;
+  const el=document.querySelector('.task[data-code="'+code+'"]');
+  const addBtn=el&&el.querySelector('.ph-add');
+  const origLabel=addBtn?addBtn.innerHTML:'';
   for(const f of files){
     if(arr.length>=MAX_PHOTOS)break;
-    let buf=null;try{buf=await f.arrayBuffer();}catch(e){}
-    const exif=buf?parseExif(buf):{gps:null,taken:null};
-    const data=await blobToDataURL(f);const hash=simpleHash(data);const flags=[];
-    if(!exif.gps)flags.push('ไม่มีพิกัด');
-    if(exif.taken&&dayDiff(exif.taken,todayKey())>ALLOW_DAYS)flags.push('รูปเก่า');
-    if(isDup(hash,code)){
-      const a=await showModal({icon:'<i class="ti ti-photo-search"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'รูปนี้เคยส่งไปแล้วนะคะ 😊',
-        body:'รูปนี้เหมือนกับที่เคยส่ง — ถ้าเป็นคนละงาน รบกวนถ่ายใหม่หน้างานอีกครั้งนะคะ จะได้เป็นหลักฐานของงานนี้จริง ๆ',
-        buttons:[{label:'📷 ถ่ายรูปใหม่',val:'new',cls:'pri'},{label:'ใช้รูปนี้ต่อ',val:'use'}],note:'ไม่บังคับ — ส่งต่อได้ (ระบบจะบันทึกให้หัวหน้าดูอีกที)'});
-      if(a.val!=='use')continue;
-      flags.push('รูปซ้ำ');
+    if(addBtn)addBtn.innerHTML='<span>⏳</span>กำลังโหลด...';
+    try{
+      let buf=null;try{buf=await f.arrayBuffer();}catch(e){}
+      const exif=buf?parseExif(buf):{gps:null,taken:null};
+      const data=await resizeImageBlob(f,1600,0.72);
+      const hash=simpleHash(data);const flags=[];
+      if(!exif.gps)flags.push('ไม่มีพิกัด');
+      if(exif.taken&&dayDiff(exif.taken,todayKey())>ALLOW_DAYS)flags.push('รูปเก่า');
+      if(isDup(hash,code)){
+        const a=await showModal({icon:'<i class="ti ti-photo-search"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'รูปนี้เคยส่งไปแล้วนะคะ 😊',
+          body:'รูปนี้เหมือนกับที่เคยส่ง — ถ้าเป็นคนละงาน รบกวนถ่ายใหม่หน้างานอีกครั้งนะคะ จะได้เป็นหลักฐานของงานนี้จริง ๆ',
+          buttons:[{label:'📷 ถ่ายรูปใหม่',val:'new',cls:'pri'},{label:'ใช้รูปนี้ต่อ',val:'use'}],note:'ไม่บังคับ — ส่งต่อได้ (ระบบจะบันทึกให้หัวหน้าดูอีกที)'});
+        if(a.val!=='use')continue;
+        flags.push('รูปซ้ำ');
+      }
+      arr.push({data:data,hash:hash,gps:exif.gps,taken:exif.taken,flags:flags});
+      renderPhotos(code);recalc();
+    }catch(err){
+      renderPhotos(code);
+      await showModal({icon:'⚠️',iconBg:'var(--danger-bg)',iconFg:'var(--danger)',title:'แนบรูปไม่สำเร็จ',
+        body:'รูปนี้แนบไม่ได้ ลองถ่ายใหม่หรือเลือกรูปอื่นอีกครั้งนะคะ',buttons:[{label:'รับทราบ',val:'ok',cls:'pri'}]});
     }
-    arr.push({data:data,hash:hash,gps:exif.gps,taken:exif.taken,flags:flags});
-    renderPhotos(code);recalc();
   }
+  if(addBtn&&addBtn.isConnected)addBtn.innerHTML=origLabel;
 }
 $('#photoInput').onchange=async e=>{
   const files=Array.from(e.target.files||[]);e.target.value='';
