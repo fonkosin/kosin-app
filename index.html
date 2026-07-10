@@ -171,7 +171,6 @@
     <div class="tabs"><button class="tab on" id="tabBtnReport">รายงาน</button><button class="tab" id="tabBtnPlan">แพลนงาน</button></div>
     <div id="tabReport">
       <div class="body">
-        <div id="dupWarn"></div>
         <div id="holidayNote" class="hidden" style="background:var(--danger-bg);color:var(--danger);border-radius:10px;padding:9px 12px;font-size:12px;margin-bottom:12px"></div>
         <div id="boothCtrl" class="card hidden" style="margin-bottom:12px"></div>
         <div class="card">
@@ -197,6 +196,10 @@
         </div>
         <div class="lbl" style="margin:2px 4px 8px">✅ เลือกงานที่ทำ — <span style="color:var(--danger)">แต่ละงานต้องแนบรูปอย่างน้อย 1 รูป</span></div>
         <div id="tasks"></div>
+        <div class="card">
+          <div class="lbl">📝 หมายเหตุ (ถ้าต้องการแก้ไข/แจ้งเพิ่มเติมจากรายงานก่อนหน้า)</div>
+          <textarea class="field" id="reportNoteIn" rows="2" placeholder="เช่น แก้ไขรายงานเมื่อวาน เพราะ...​ (ไม่บังคับ — ส่งวันซ้ำ/แก้ไขได้ตามปกติ)"></textarea>
+        </div>
       </div>
       <div class="bar">
         <div class="hint" id="hint"></div>
@@ -251,7 +254,7 @@ const MAX_PHOTOS=5, DOC_GRACE_DAYS=7, ALLOW_DAYS=3, LOC_THRESHOLD_KM=1;
 const TASK_MAP={};TASK_GROUPS.forEach(g=>g.tasks.forEach(t=>{TASK_MAP[t.c]=Object.assign({group:g.id},t);}));
 const SUBMIT_URL=(window.APP_CONFIG&&window.APP_CONFIG.SUBMIT_URL)||"";
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
-let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false;
+let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false, reportNote='';
 const BACKDATE_MAX_DAYS=7;
 /* วันประชุมบริษัท (กลางปี/ปลายปี) — ช่าง ตจว. มา HQ = ไม่เบิกเบี้ยเลี้ยง · ใส่วันที่ทีหลัง เช่น {'2026-12-20':'ประชุมปลายปี'} */
 const COMPANY_MEETING={};
@@ -416,11 +419,15 @@ function techGroup(t){
   if(techRegion(t)==='กทม./ปริมณฑล')return 'bkk';
   return (((window.TCJ_HOME||{})[t.name]||[]).indexOf('กทม')>=0)?'hybrid':'tcj';
 }
+function getLastTechName(){try{return localStorage.getItem('kosin_lasttech')||'';}catch(e){return'';}}
+function saveLastTechName(name){try{localStorage.setItem('kosin_lasttech',name);}catch(e){}}
 function buildLogin(){
   const g={bkk:$('#grpBkk'),hybrid:$('#grpHybrid'),tcj:$('#grpTcj')};
   for(const k in g)g[k].innerHTML='';
   allTechs().forEach(t=>{const o=document.createElement('option');o.value=t.name;o.textContent=t.name+((t.status==='pending'||t.status==='รอยืนยัน')?' · รอยืนยัน':'');(g[techGroup(t)]||g.tcj).appendChild(o);});
-  $('#techPick').value='';$('#loginMsg').textContent='';
+  const last=getLastTechName();
+  $('#techPick').value=(last&&findTech(last))?last:'';
+  $('#loginMsg').textContent='';
 }
 function findTech(name){return allTechs().find(t=>t.name.trim()===String(name).trim());}
 $('#techGo').onclick=()=>{
@@ -431,7 +438,7 @@ $('#techGo').onclick=()=>{
   if(!t){$('#loginMsg').textContent='ไม่พบชื่อนี้';return;}
   const pending=(t.status==='pending'||t.status==='รอยืนยัน');
   if(pending && SUBMIT_URL){showModal({icon:'<i class="ti ti-clock-hour-4"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'รอแอดมินยืนยันก่อนนะคะ 😊',body:'ชื่อของคุณถูกเพิ่มเข้าระบบแล้ว รอแอดมินยืนยันสักครู่ แล้วจะเข้าใช้งานได้เลยค่ะ',buttons:[{label:'รับทราบ',val:'ok',cls:'pri'}]});return;}
-  currentTech=t;enterApp();
+  currentTech=t;saveLastTechName(t.name);enterApp();
 };
 $('#techPick').addEventListener('change',()=>{if($('#techPick').value==='__add__')addTechFlow('');});
 async function addTechFlow(prefillName){
@@ -485,12 +492,46 @@ function getLastHos(){return lastHosMap()[currentTech.name]||'';}
 function saveLastHos(name){if(!name)return;const m=lastHosMap();m[currentTech.name]=name;localStorage.setItem('kosin_lasthos',JSON.stringify(m));}
 function resetForm(){
   $('#today').textContent=todayStr();clearBackdate();buildTasks();
-  $('#hosInput').value=getLastHos();$('#hosInfo').classList.add('hidden');$('#hosFree').classList.add('hidden');$('#dupWarn').innerHTML='';$('#typedProv').value='';$('#typedProvBox').classList.add('hidden');
+  $('#hosInput').value=getLastHos();$('#hosInfo').classList.add('hidden');$('#hosFree').classList.add('hidden');$('#typedProv').value='';$('#typedProvBox').classList.add('hidden');
   $('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='—';gps='';selected={};
   perDiemPeriod='ทั้งวัน';perDiemAmt=250;boothFull=true;$('#pdCard').classList.add('hidden');$('#boothCtrl').classList.add('hidden');
   $('#hosInput').placeholder='เลือก/พิมพ์ชื่อ รพ. (ที่ไหนก็ได้ ข้ามเขตได้)';
+  reportNote='';$('#reportNoteIn').value='';
   if($('#hosInput').value)applyHos();
   window.scrollTo(0,0);recalc();
+}
+$('#reportNoteIn').addEventListener('input',e=>{reportNote=e.target.value;saveSession();});
+
+/* ===== กันงานหาย: จำสถานะรายงานที่กรอกค้างไว้ (กันมือถือรีเฟรชแท็บตอนสลับไปกล้อง/คลังภาพ) ===== */
+function saveSession(){
+  if(!currentTech)return;
+  try{
+    sessionStorage.setItem('kosin_session',JSON.stringify({
+      savedAt:Date.now(),tech:currentTech,hos:$('#hosInput').value,typedProv:$('#typedProv').value,
+      selected:selected,reportDate:reportDate,reportNote:reportNote,
+      perDiemPeriod:perDiemPeriod,perDiemAmt:perDiemAmt,boothFull:boothFull
+    }));
+  }catch(e){}
+}
+function loadSession(){try{return JSON.parse(sessionStorage.getItem('kosin_session')||'null');}catch(e){return null;}}
+function clearSession(){try{sessionStorage.removeItem('kosin_session');}catch(e){}}
+function restoreSession(sess){
+  currentTech=sess.tech;enterApp();
+  if(sess.reportDate){reportDate=sess.reportDate;$('#backdateDate').value=reportDate.key;$('#today').innerHTML=reportDate.th+' <span style="color:var(--amber);font-size:11px;font-weight:400">· ย้อนหลัง (บันทึกส่งสาย)</span>';$('#backdatePanel').classList.remove('hidden');}
+  selected=sess.selected||{};
+  perDiemPeriod=sess.perDiemPeriod||'ทั้งวัน';perDiemAmt=sess.perDiemAmt||250;boothFull=(sess.boothFull!==false);
+  reportNote=sess.reportNote||'';$('#reportNoteIn').value=reportNote;
+  $('#hosInput').value=sess.hos||'';$('#typedProv').value=sess.typedProv||'';
+  Object.keys(selected).forEach(code=>{
+    const el=document.querySelector('.task[data-code="'+code+'"]');if(!el)return;
+    el.classList.add('on');el.querySelector('.task-detail').classList.remove('hidden');
+    const noteIn=el.querySelector('.note-in');if(noteIn)noteIn.value=selected[code].note||'';
+    const descIn=el.querySelector('.desc-in');if(descIn)descIn.value=selected[code].desc||'';
+    renderPhotos(code);
+    const grp=el.closest('.grp');if(grp)grp.classList.add('open');
+    updGroupCount(TASK_MAP[code].group);
+  });
+  if($('#hosInput').value)applyHos();else recalc();
 }
 function buildTasks(){
   const box=$('#tasks');box.innerHTML='';
@@ -508,7 +549,7 @@ function buildTasks(){
         '<input class="desc-in" style="width:100%;border:1px solid '+(t.c==='K1'?'var(--green)':'var(--line2)')+';border-radius:9px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--txt);margin-bottom:8px" placeholder="'+(t.c==='K1'?'ระบุงานที่ทำ (จำเป็น)':'รายละเอียดงานที่ทำ (ถ้ามี)')+'">'+
         '<span class="req miss">ต้องแนบรูป ≥1</span><div class="photos"></div><input class="note-in" placeholder="ปัญหาที่พบ (ถ้ามี)"></div>';
       el.querySelector('.task-row').onclick=()=>toggleTask(t.c,g.id,el);
-      el.querySelector('.note-in').oninput=e=>{if(selected[t.c])selected[t.c].note=e.target.value;};
+      el.querySelector('.note-in').oninput=e=>{if(selected[t.c]){selected[t.c].note=e.target.value;saveSession();}};
       const kd=el.querySelector('.desc-in');if(kd)kd.oninput=e=>{if(selected[t.c]){selected[t.c].desc=e.target.value;recalc();}};
       const df=el.querySelector('[data-defer]');if(df)df.onclick=()=>{if(!selected[t.c])return;selected[t.c].defer=!selected[t.c].defer;df.classList.toggle('on',selected[t.c].defer);};
       body.appendChild(el);
@@ -596,6 +637,7 @@ function recalc(){
   const kMiss=sel.some(s=>s.code==='K1'&&!(s.desc&&s.desc.trim()));
   if(!hname){ok=false;hint='• กรอกชื่อสถานที่';}else if(sel.length===0){ok=false;hint='• เลือกงานอย่างน้อย 1 งาน';}else if(missing.length){ok=false;hint='• ยังขาดรูปแนบ '+missing.length+' งาน';}else if(kMiss){ok=false;hint='• ระบุรายละเอียด "งานอื่นๆ" ก่อนส่ง';}
   $('#sendBtn').disabled=!ok;$('#hint').textContent=ok?'':hint;
+  saveSession();
 }
 /* ค่าตอบแทนอิงสถานที่ (ไขว้เขตได้): กทม./ปริมณฑล=ค่าจุด · ตจว.=เบี้ยเลี้ยง(นอกฐาน) */
 function provBkk(a){return (a==='กทม.'||a==='กทม')?'กทม':a;}
@@ -647,7 +689,6 @@ function applyHos(){
   }else{
     $('#trvLabel').textContent='ค่าเดินทาง';$('#trvVal').textContent='—';
   }
-  if(v)checkDup(v);else $('#dupWarn').innerHTML='';
   recalc();
 }
 $('#hosInput').addEventListener('input',applyHos);
@@ -670,7 +711,7 @@ function onBackdate(){
 }
 $('#backdateDate').onchange=onBackdate;
 function clearBackdate(){reportDate=null;$('#backdateDate').value='';$('#today').textContent=todayStr();$('#backdatePanel').classList.add('hidden');}
-function checkDup(name){const dup=getReports().some(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.hospital===name&&r.dateKey===effDateKey());$('#dupWarn').innerHTML=dup?'<div class="warn">⚠️ <div>วันนี้คุณรายงาน <b>'+name+'</b> ไปแล้ว — ตรวจสอบก่อนส่งซ้ำ</div></div>':'';}
+function isDupReport(name){return getReports().some(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.hospital===name&&r.dateKey===effDateKey());}
 
 /* ===== SUBMIT ===== */
 async function doSubmit(){
@@ -704,10 +745,11 @@ async function doSubmit(){
     area:area,travel:travel,allowanceType:allowanceType,period:period,perDiem:allowanceType==='เบี้ยเลี้ยง'&&travel>0,
     isHoliday:holiday,holidayBonus:hc.bonus,ot:hc.ot,
     late:!!reportDate,lateDays:lateDays,
-    gps:gps,device:dev,deviceId:devId};
+    gps:gps,device:dev,deviceId:devId,reportNote:reportNote.trim()};
+  const dupFlag=isDupReport(hname);
   const recs=sel.map(s=>{
     const defer=s.code==='G1'&&s.defer;let deadline='';if(defer){const dd=new Date(now);dd.setDate(dd.getDate()+DOC_GRACE_DAYS);deadline=dd.toISOString();}
-    const pf={};s.photos.forEach(p=>(p.flags||[]).forEach(f=>pf[f]=1));if(locFlag)pf['พิกัดไม่ตรง']=1;if(devNew)pf['อุปกรณ์ใหม่']=1;if(reportDate)pf['ส่งสาย '+lateDays+' วัน']=1;if(allowanceType==='ค่าจุด (รอพิจารณา)')pf['รอพิจารณาค่าจุด']=1;
+    const pf={};s.photos.forEach(p=>(p.flags||[]).forEach(f=>pf[f]=1));if(locFlag)pf['พิกัดไม่ตรง']=1;if(devNew)pf['อุปกรณ์ใหม่']=1;if(reportDate)pf['ส่งสาย '+lateDays+' วัน']=1;if(allowanceType==='ค่าจุด (รอพิจารณา)')pf['รอพิจารณาค่าจุด']=1;if(dupFlag)pf['รายงานซ้ำวันเดียวกัน']=1;
     const pGps=(s.photos.find(p=>p.gps)||{}).gps;
     return Object.assign({},base,{id:Date.now()+'_'+s.code+'_'+Math.random().toString(36).slice(2,6),code:s.code,label:(s.desc&&s.desc.trim())?(s.label+' — '+s.desc.trim()):s.label,desc:s.desc||'',points:s.pt,note:s.note,
       photoCount:s.photos.length,photoGps:pGps?(pGps.lat+', '+pGps.lng):'',flags:Object.keys(pf),status:defer?'รอเอกสาร':'รอตรวจ',docDeadline:deadline,ts:now.toISOString()});
@@ -716,6 +758,7 @@ async function doSubmit(){
   const hs=submittedHashes();sel.forEach(s=>s.photos.forEach(p=>hs.push(p.hash)));localStorage.setItem('kosin_hashes',JSON.stringify(hs));
   learnCoords(hname,photoGps[0]);
   if(SUBMIT_URL)sel.forEach((s,i)=>{fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify(Object.assign({},recs[i],{photos:s.photos.map(p=>p.data)}))}).catch(()=>{});});
+  clearSession();
   showOk(recs,h,all);
 }
 $('#sendBtn').onclick=()=>{doSubmit();};
@@ -730,7 +773,7 @@ function showOk(recs,h,all){
   $('#todayCount').textContent='วันนี้คุณรายงานแล้ว '+mine.length+' งาน';
 }
 $('#againBtn').onclick=()=>{$('#scrOk').classList.add('hidden');$('#scrApp').classList.remove('hidden');switchTab('report');resetForm();};
-function goLogin(){currentTech=null;$('#scrOk').classList.add('hidden');$('#scrApp').classList.add('hidden');$('#scrLogin').classList.remove('hidden');buildLogin();}
+function goLogin(){currentTech=null;clearSession();$('#scrOk').classList.add('hidden');$('#scrApp').classList.add('hidden');$('#scrLogin').classList.remove('hidden');buildLogin();}
 $('#logoutBtn').onclick=goLogin;
 $('#backBtn').onclick=()=>{
   if(Object.keys(selected).length){
@@ -912,7 +955,13 @@ function planSummaryHtml(ws){
 }
 
 applyTheme();
-buildLogin();
+const __savedSession=loadSession();
+if(__savedSession&&__savedSession.tech&&(Date.now()-(__savedSession.savedAt||0))<6*3600*1000){
+  restoreSession(__savedSession);
+}else{
+  clearSession();
+  buildLogin();
+}
 initLiff();
 if(SUBMIT_URL)refreshMaster();
 </script>

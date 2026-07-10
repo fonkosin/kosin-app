@@ -8,6 +8,9 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ตรวจงานช่าง · KOSIN</title>
+<link rel="icon" href="favicon-32.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#F5620F">
 <style>
   :root{--green:#F5620F;--green-dk:#ffffff;--brand-tint:#FFF0E6;--brand-tintbg:#fff4ec;--brand-tintborder:#f5cba3;--brand-dark:#b34205;--bg:#f5f4f2;--card:#fff;--line:#e6e4e0;--line2:#d3d0ca;
     --txt:#1a1d21;--mut:#6b7280;--mut2:#9aa0a8;--accent:#185FA5;--accent-bg:#E6F1FB;--danger:#A32D2D;--danger-bg:#FCEBEB;
@@ -130,6 +133,7 @@ function render(){
         (r.isHoliday?('<span>🌴 วันหยุด'+(r.holidayBonus?(' · ค่า Workshop วันหยุด +'+r.holidayBonus):'')+(r.ot?' · มี OT':'')+'</span>'):'')+
         '</div>'+
         (r.note?('<div class="note">📝 '+r.note+'</div>'):'')+
+        (r.reportNote?('<div class="note" style="background:var(--amber-bg);color:var(--amber)">✏️ หมายเหตุแก้ไข: '+r.reportNote+'</div>'):'')+
         (flags.length?('<div class="flags">'+flags.map(f=>'<span class="flag">⚑ '+f+'</span>').join('')+'</div>'):'')+
         (photos.length?('<div class="photos">'+photos.map((p,i)=>'<a class="photolink" href="'+p+'" target="_blank" rel="noopener">📷 รูปที่ '+(i+1)+'</a>').join('')+'</div>'):'<div class="meta">ไม่มีรูปแนบ</div>')+
         '<div class="actions">'+
