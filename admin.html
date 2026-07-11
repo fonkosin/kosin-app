@@ -56,14 +56,34 @@
   .abtn:disabled{opacity:.4;cursor:default}
   .points{font-size:12px;color:var(--accent);font-weight:600}
   .loading{text-align:center;color:var(--mut);padding:60px 20px}
+  .hidden{display:none !important}
+  .lockwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .lockbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px;max-width:320px;width:100%;text-align:center}
+  .lockbox .ic{font-size:32px;margin-bottom:8px}
+  .lockbox h2{font-size:16px;margin:0 0 4px}
+  .lockbox p{font-size:12.5px;color:var(--mut);margin:0 0 16px}
+  .lockbox input{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;text-align:center;margin-bottom:10px;box-sizing:border-box}
+  .lockbox button{width:100%;background:var(--green);color:var(--green-dk);border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .lockbox .err{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="lockwrap" id="lockScreen">
+  <div class="lockbox">
+    <div class="ic">🔒</div>
+    <h2>หน้าตรวจงานช่าง</h2>
+    <p>ใส่รหัสผ่านเพื่อเข้าใช้งาน</p>
+    <input type="password" id="lockPass" placeholder="รหัสผ่าน" autocomplete="off">
+    <input type="text" id="lockReviewer" placeholder="ชื่อผู้ตรวจ (คุณคือใคร)" autocomplete="off" style="margin-top:-2px">
+    <button id="lockBtn">เข้าใช้งาน</button>
+    <div class="err" id="lockErr"></div>
+  </div>
+</div>
+<div class="wrap hidden" id="mainWrap">
   <div class="top">
     <div>
       <h1>🔧 ตรวจงานช่าง</h1>
-      <div class="sub">KOSIN · หลังบ้าน</div>
+      <div class="sub">KOSIN · หลังบ้าน · ผู้ตรวจ: <span id="reviewerLabel"></span> <a href="#" id="changeReviewer" style="color:inherit;text-decoration:underline">(เปลี่ยน)</a></div>
     </div>
     <button class="refresh" id="refreshBtn">🔄 รีเฟรช</button>
   </div>
@@ -127,7 +147,7 @@ function render(){
       const photos=(r.photoLinks?String(r.photoLinks).split('\n').filter(Boolean):[]);
       const st=r.status||'รอตรวจ';
       h+='<div class="card" data-id="'+r.id+'">'+
-        '<div class="r1"><div><div class="lbl">'+r.code+' · '+r.label+'</div><div class="meta">'+r.dateTh+' · 📍 '+r.hospital+'</div></div>'+statusBadge(st)+'</div>'+
+        '<div class="r1"><div><div class="lbl">'+r.code+' · '+r.label+'</div><div class="meta">'+r.dateTh+' · 📍 '+r.hospital+(r.reviewer?(' · ตรวจโดย '+r.reviewer):'')+'</div></div>'+statusBadge(st)+'</div>'+
         '<div class="row2"><span>ค่าตอบแทน: <b>'+(r.travel||0)+' บาท</b> ('+(r.allowanceType||'-')+(r.period?(' · '+r.period):'')+')</span><span>คะแนน: <b class="points">'+(r.points||0)+'</b></span>'+
         (r.lateDays?('<span style="color:var(--danger)">⏰ ส่งสาย '+r.lateDays+' วัน</span>'):'')+
         (r.isHoliday?('<span>🌴 วันหยุด'+(r.holidayBonus?(' · ค่า Workshop วันหยุด +'+r.holidayBonus):'')+(r.ot?' · มี OT':'')+'</span>'):'')+
@@ -149,22 +169,62 @@ function render(){
   $$('[data-reject]').forEach(b=>b.onclick=()=>setStatus(b.getAttribute('data-reject'),'ไม่ผ่าน'));
   $$('[data-approveall]').forEach(b=>b.onclick=()=>approveAll(b.getAttribute('data-approveall'),b));
 }
+function reviewerName(){ return localStorage.getItem('kosin_reviewer_name')||''; }
 function setStatus(id,status){
   const r=reports.find(x=>x.id===id); if(r)r.status=status;
   render();
-  fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:(status==='ผ่าน'?'approve':'reject'),id:id})}).catch(()=>{});
+  fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:(status==='ผ่าน'?'approve':'reject'),id:id,reviewer:reviewerName()})}).catch(()=>{});
 }
 function approveAll(tech,btn){
   btn.disabled=true;btn.textContent='กำลังอนุมัติ…';
   reports.forEach(r=>{if(r.tech===tech&&(!r.status||r.status==='รอตรวจ'))r.status='ผ่าน';});
   render();
-  fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'approveAll',tech:tech})}).catch(()=>{});
+  fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'approveAll',tech:tech,reviewer:reviewerName()})}).catch(()=>{});
 }
 $$('.ftab').forEach(b=>b.onclick=()=>{$$('.ftab').forEach(x=>x.classList.remove('on'));b.classList.add('on');curFilter=b.dataset.f;render();});
 $('#techFilter').onchange=e=>{curTech=e.target.value;render();};
 $('#refreshBtn').onclick=loadReports;
 applyTheme();
-loadReports();
+
+/* ล็อกด้วยรหัสผ่านง่ายๆ ฝั่ง browser — กันคนทั่วไปเปิดลิงก์เข้าถึงโดยไม่ตั้งใจ ไม่ใช่ระบบความปลอดภัยจริงจัง */
+function unlock(){
+  $('#lockScreen').classList.add('hidden');
+  $('#mainWrap').classList.remove('hidden');
+  $('#reviewerLabel').textContent=reviewerName();
+  loadReports();
+}
+$('#changeReviewer').addEventListener('click',e=>{
+  e.preventDefault();
+  sessionStorage.removeItem('kosin_admin_ok');
+  $('#mainWrap').classList.add('hidden');
+  $('#lockScreen').classList.remove('hidden');
+  $('#lockPass').value='';
+  $('#lockReviewer').focus();
+});
+$('#lockReviewer').value=reviewerName();
+function tryUnlock(){
+  const pass=(window.APP_CONFIG&&window.APP_CONFIG.ADMIN_PASSWORD)||'';
+  const val=$('#lockPass').value;
+  const rv=$('#lockReviewer').value.trim();
+  if(!rv){
+    $('#lockErr').textContent='กรอกชื่อผู้ตรวจก่อนนะคะ';
+    $('#lockReviewer').focus();
+    return;
+  }
+  if(!pass||val===pass){
+    localStorage.setItem('kosin_reviewer_name',rv);
+    sessionStorage.setItem('kosin_admin_ok','1');
+    unlock();
+  }else{
+    $('#lockErr').textContent='รหัสผ่านไม่ถูกต้อง';
+    $('#lockPass').value='';$('#lockPass').focus();
+  }
+}
+$('#lockBtn').onclick=tryUnlock;
+$('#lockPass').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+$('#lockReviewer').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lockPass').focus();});
+if(sessionStorage.getItem('kosin_admin_ok')==='1'&&reviewerName())unlock();
+else $('#lockReviewer').focus();
 </script>
 </body>
 </html>
