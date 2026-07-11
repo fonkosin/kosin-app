@@ -62,7 +62,7 @@
   .lockbox .ic{font-size:32px;margin-bottom:8px}
   .lockbox h2{font-size:16px;margin:0 0 4px}
   .lockbox p{font-size:12.5px;color:var(--mut);margin:0 0 16px}
-  .lockbox input{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;text-align:center;margin-bottom:10px;box-sizing:border-box}
+    .lockbox input,.lockbox select{width:100%;border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;text-align:center;margin-bottom:10px;box-sizing:border-box;background:#fff;color:inherit}
   .lockbox button{width:100%;background:var(--green);color:var(--green-dk);border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
   .lockbox .err{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px}
 </style>
@@ -74,7 +74,13 @@
     <h2>หน้าตรวจงานช่าง</h2>
     <p>ใส่รหัสผ่านเพื่อเข้าใช้งาน</p>
     <input type="password" id="lockPass" placeholder="รหัสผ่าน" autocomplete="off">
-    <input type="text" id="lockReviewer" placeholder="ชื่อผู้ตรวจ (คุณคือใคร)" autocomplete="off" style="margin-top:-2px">
+        <select id="lockReviewer" autocomplete="off" style="margin-top:-2px">
+                <option value="">— เลือกชื่อผู้ตรวจ —</option>
+                <option value="ศุภรัตน์ ซ้ายสุข">ศุภรัตน์ ซ้ายสุข</option>
+                <option value="ดาวรุ่ง วงศ์สารัตน์">ดาวรุ่ง วงศ์สารัตน์</option>
+                <option value="__other__">อื่นๆ โปรดระบุ</option>
+        </select>
+        <input type="text" id="lockReviewerOther" placeholder="พิมพ์ชื่อผู้ตรวจ" autocomplete="off" style="margin-top:-2px;display:none">
     <button id="lockBtn">เข้าใช้งาน</button>
     <div class="err" id="lockErr"></div>
   </div>
@@ -193,21 +199,35 @@ function unlock(){
   $('#reviewerLabel').textContent=reviewerName();
   loadReports();
 }
-$('#changeReviewer').addEventListener('click',e=>{
+const REVIEWER_PRESETS=['ศุภรัตน์ ซ้ายสุข','ดาวรุ่ง วงศ์สารัตน์'];
+  function prefillReviewer(){
+      const rv=reviewerName();
+      if(REVIEWER_PRESETS.indexOf(rv)>=0){$('#lockReviewer').value=rv;$('#lockReviewerOther').style.display='none';$('#lockReviewerOther').value='';}
+      else if(rv){$('#lockReviewer').value='__other__';$('#lockReviewerOther').style.display='block';$('#lockReviewerOther').value=rv;}
+      else{$('#lockReviewer').value='';$('#lockReviewerOther').style.display='none';$('#lockReviewerOther').value='';}
+  }
+  $('#lockReviewer').addEventListener('change',()=>{
+      const isOther=$('#lockReviewer').value==='__other__';
+      $('#lockReviewerOther').style.display=isOther?'block':'none';
+      if(isOther)$('#lockReviewerOther').focus();
+  });
+  $('#changeReviewer').addEventListener('click',e=>{
   e.preventDefault();
   sessionStorage.removeItem('kosin_admin_ok');
   $('#mainWrap').classList.add('hidden');
   $('#lockScreen').classList.remove('hidden');
   $('#lockPass').value='';
-  $('#lockReviewer').focus();
+prefillReviewer();
+      $('#lockReviewer').focus();
 });
-$('#lockReviewer').value=reviewerName();
+prefillReviewer();
 function tryUnlock(){
   const pass=(window.APP_CONFIG&&window.APP_CONFIG.ADMIN_PASSWORD)||'';
   const val=$('#lockPass').value;
-  const rv=$('#lockReviewer').value.trim();
+  const sel=$('#lockReviewer').value;
+    const rv=(sel==='__other__'?$('#lockReviewerOther').value:sel).trim();
   if(!rv){
-    $('#lockErr').textContent='กรอกชื่อผู้ตรวจก่อนนะคะ';
+    $('#lockErr').textContent='เลือก/กรอกชื่อผู้ตรวจก่อนนะคะ';
     $('#lockReviewer').focus();
     return;
   }
@@ -222,7 +242,8 @@ function tryUnlock(){
 }
 $('#lockBtn').onclick=tryUnlock;
 $('#lockPass').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
-$('#lockReviewer').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lockPass').focus();});
+$('#lockReviewer').addEventListener('keydown',e=>{if(e.key==='Enter')($('#lockReviewer').value==='__other__'?$('#lockReviewerOther').focus():$('#lockPass').focus());});
+  $('#lockReviewerOther').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lockPass').focus();});
 if(sessionStorage.getItem('kosin_admin_ok')==='1'&&reviewerName())unlock();
 else $('#lockReviewer').focus();
 </script>
