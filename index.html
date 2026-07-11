@@ -222,7 +222,6 @@
       <div class="summ" id="okSumm"></div>
       <button class="send" style="width:100%;padding:14px" id="againBtn">＋ รายงานสถานที่ถัดไป</button>
       <div class="todaybox" id="todayCount"></div>
-      <button class="btn" style="width:100%;margin-top:8px" id="pdfBtn">📄 ดาวน์โหลดรายงานของฉัน (PDF)</button>
       <button class="link" id="logoutBtn">ออกจากระบบ</button>
     </div>
   </section>
@@ -256,7 +255,7 @@ const MAX_PHOTOS=5, DOC_GRACE_DAYS=7, ALLOW_DAYS=3, LOC_THRESHOLD_KM=1;
 const TASK_MAP={};TASK_GROUPS.forEach(g=>g.tasks.forEach(t=>{TASK_MAP[t.c]=Object.assign({group:g.id},t);}));
 const SUBMIT_URL=(window.APP_CONFIG&&window.APP_CONFIG.SUBMIT_URL)||"";
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
-let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false, reportNote='', lastReportDateKey=null;
+let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false, reportNote='';
 const BACKDATE_MAX_DAYS=7;
 /* ปฏิทินวันหยุด/เสาร์ประชุม/5ส/วันประชุมบริษัท — ค่าเริ่มต้นนี้ใช้เฉพาะก่อนซิงค์จาก Sheet เท่านั้น
    แหล่งข้อมูลจริง = Google Sheet แท็บ "วันหยุด" (refreshMaster() ดึงมาทับค่าเหล่านี้ทั้งหมดหลังเข้าแอปเสร็จ)
@@ -797,33 +796,10 @@ function showOk(recs,h,all){
   $('#okSumm').innerHTML='<div class="r"><span>ช่าง</span><span>'+recs[0].tech+'</span></div><div class="r"><span>สถานที่</span><span>'+recs[0].hospital+'</span></div><div class="tasks" style="padding:8px 0">'+list+'</div><div class="r"><span>รวม</span><span>'+recs.length+' งาน · '+totPh+' รูป</span></div>';
   const mine=all.filter(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.dateKey===todayKey());
   $('#todayCount').textContent='วันนี้คุณรายงานแล้ว '+mine.length+' งาน';
-  lastReportDateKey=recs[0].dateKey;
-}
+  
 $('#againBtn').onclick=()=>{$('#scrOk').classList.add('hidden');$('#scrApp').classList.remove('hidden');switchTab('report');resetForm();};
 function goLogin(){currentTech=null;clearSession();$('#scrOk').classList.add('hidden');$('#scrApp').classList.add('hidden');$('#scrLogin').classList.remove('hidden');buildLogin();}
 $('#logoutBtn').onclick=goLogin;
-function downloadMyPdf(){
-  if(!SUBMIT_URL){showModal({icon:'📄',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'โหมดทดลอง',body:'ดาวน์โหลด PDF ใช้ได้เฉพาะตอนเชื่อมต่อระบบจริงแล้วค่ะ',buttons:[{label:'ตกลง',val:'ok'}]});return;}
-  const btn=$('#pdfBtn'),orig=btn.textContent;btn.textContent='กำลังสร้าง PDF...';btn.disabled=true;
-  window.__kosinPdf=function(d){
-    btn.textContent=orig;btn.disabled=false;
-    if(d&&d.ok&&d.url){
-      if(navigator.share){
-        navigator.share({title:'รายงานของฉัน (PDF)',text:'รายงานของฉัน — '+currentTech.name,url:d.url}).catch(()=>{});
-      }else{
-        window.open(d.url,'_blank');
-      }
-    }else{
-      showModal({icon:'⚠️',iconBg:'var(--danger-bg)',iconFg:'var(--danger)',title:'สร้าง PDF ไม่สำเร็จ',body:'ลองใหม่อีกครั้งนะคะ',buttons:[{label:'ตกลง',val:'ok'}]});
-    }
-  };
-  const s=document.createElement('script');
-  const dk=lastReportDateKey||todayKey();
-  s.src=SUBMIT_URL+(SUBMIT_URL.indexOf('?')<0?'?':'&')+'mypdf=1&tech='+encodeURIComponent(currentTech.name)+'&period=today&date='+dk+'&callback=__kosinPdf';
-  s.onerror=()=>{btn.textContent=orig;btn.disabled=false;};
-  document.body.appendChild(s);
-}
-$('#pdfBtn').onclick=downloadMyPdf;
 $('#backBtn').onclick=()=>{
   if(Object.keys(selected).length){
     showModal({icon:'<i class="ti ti-arrow-back-up"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'กลับไปเลือกชื่อ?',body:'งานที่กรอกค้างไว้จะหาย ยืนยันไหมคะ',buttons:[{label:'กลับไปเลือกชื่อ',val:'go',cls:'pri'},{label:'อยู่ต่อ',val:'stay'}]}).then(a=>{if(a.val==='go')goLogin();});
