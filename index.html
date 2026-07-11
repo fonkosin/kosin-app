@@ -222,6 +222,7 @@
       <div class="summ" id="okSumm"></div>
       <button class="send" style="width:100%;padding:14px" id="againBtn">＋ รายงานสถานที่ถัดไป</button>
       <div class="todaybox" id="todayCount"></div>
+      <button class="btn" style="width:100%;margin-top:8px" id="pdfBtn">📄 ดาวน์โหลดรายงานของฉัน (PDF)</button>
       <button class="link" id="logoutBtn">ออกจากระบบ</button>
     </div>
   </section>
@@ -255,17 +256,21 @@ const MAX_PHOTOS=5, DOC_GRACE_DAYS=7, ALLOW_DAYS=3, LOC_THRESHOLD_KM=1;
 const TASK_MAP={};TASK_GROUPS.forEach(g=>g.tasks.forEach(t=>{TASK_MAP[t.c]=Object.assign({group:g.id},t);}));
 const SUBMIT_URL=(window.APP_CONFIG&&window.APP_CONFIG.SUBMIT_URL)||"";
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
-let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false, reportNote='';
+let currentTech=null, selected={}, gps="", activeCode=null, docRecId=null, perDiemAmt=250, perDiemPeriod='ทั้งวัน', reportDate=null, pdAllowBase=false, reportNote='', lastReportDateKey=null;
 const BACKDATE_MAX_DAYS=7;
-/* วันประชุมบริษัท (กลางปี/ปลายปี) — ช่าง ตจว. มา HQ = ไม่เบิกเบี้ยเลี้ยง · ใส่วันที่ทีหลัง เช่น {'2026-12-20':'ประชุมปลายปี'} */
-const COMPANY_MEETING={};
+/* ปฏิทินวันหยุด/เสาร์ประชุม/5ส/วันประชุมบริษัท — ค่าเริ่มต้นนี้ใช้เฉพาะก่อนซิงค์จาก Sheet เท่านั้น
+   แหล่งข้อมูลจริง = Google Sheet แท็บ "วันหยุด" (refreshMaster() ดึงมาทับค่าเหล่านี้ทั้งหมดหลังเข้าแอปเสร็จ)
+   แก้ปฏิทินปีถัดไป/เพิ่มวันประชุม → แก้ที่ Sheet แท็บ "วันหยุด" ที่เดียวพอ ไม่ต้องแก้ไฟล์นี้แล้ว */
+let COMPANY_MEETING={};
 function isMeetingDay(){return currentTech && !!COMPANY_MEETING[effDateKey()];}
 function isTcj(){return currentTech && (currentTech.region||'กทม./ปริมณฑล')==='ต่างจังหวัด';}
 function updateAllowance(){
   if(isTcj()){$('#trvLabel').textContent='เบี้ยเลี้ยง';$('#trvVal').textContent=perDiemAmt+'.-';}
   else{$('#trvLabel').textContent='ค่าเดินทาง';const h=currentHos();$('#trvVal').textContent=h?(h.travel+'.-'):'—';}
 }
-const tcjHosMap={};(window.TCJ_HOSPITALS||[]).forEach(h=>{tcjHosMap[h.name]=h;});
+let tcjHosMap={};
+function rebuildTcjHosMap(){tcjHosMap={};(window.TCJ_HOSPITALS||[]).forEach(h=>{tcjHosMap[h.name]=h;});}
+rebuildTcjHosMap();
 function tcjInfo(name){const h=tcjHosMap[name];if(!h)return null;const z=(window.TCJ_ZONES||{})[currentTech.name]||[];return{province:h.province,inZone:z.indexOf(h.province)>=0};}
 const PD_PERIODS=[{k:'เช้า',a:125},{k:'บ่าย',a:125},{k:'ทั้งวัน',a:250},{k:'ในเขตฐาน',a:0}];
 function buildPdSeg(){
@@ -488,7 +493,7 @@ function enterApp(){
 function switchTab(name){
   const map={report:['tabBtnReport','tabReport'],plan:['tabBtnPlan','tabPlan']};
   for(const n in map){$('#'+map[n][0]).classList.toggle('on',n===name);$('#'+map[n][1]).classList.toggle('hidden',n!==name);}
-  if(name==='plan')renderPlan();
+  if(name==='plan'){renderPlan();fetchMyPlans();}
 }
 $('#tabBtnReport').onclick=()=>switchTab('report');
 $('#tabBtnPlan').onclick=()=>switchTab('plan');
@@ -792,10 +797,33 @@ function showOk(recs,h,all){
   $('#okSumm').innerHTML='<div class="r"><span>ช่าง</span><span>'+recs[0].tech+'</span></div><div class="r"><span>สถานที่</span><span>'+recs[0].hospital+'</span></div><div class="tasks" style="padding:8px 0">'+list+'</div><div class="r"><span>รวม</span><span>'+recs.length+' งาน · '+totPh+' รูป</span></div>';
   const mine=all.filter(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.dateKey===todayKey());
   $('#todayCount').textContent='วันนี้คุณรายงานแล้ว '+mine.length+' งาน';
+  lastReportDateKey=recs[0].dateKey;
 }
 $('#againBtn').onclick=()=>{$('#scrOk').classList.add('hidden');$('#scrApp').classList.remove('hidden');switchTab('report');resetForm();};
 function goLogin(){currentTech=null;clearSession();$('#scrOk').classList.add('hidden');$('#scrApp').classList.add('hidden');$('#scrLogin').classList.remove('hidden');buildLogin();}
 $('#logoutBtn').onclick=goLogin;
+function downloadMyPdf(){
+  if(!SUBMIT_URL){showModal({icon:'📄',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'โหมดทดลอง',body:'ดาวน์โหลด PDF ใช้ได้เฉพาะตอนเชื่อมต่อระบบจริงแล้วค่ะ',buttons:[{label:'ตกลง',val:'ok'}]});return;}
+  const btn=$('#pdfBtn'),orig=btn.textContent;btn.textContent='กำลังสร้าง PDF...';btn.disabled=true;
+  window.__kosinPdf=function(d){
+    btn.textContent=orig;btn.disabled=false;
+    if(d&&d.ok&&d.url){
+      if(navigator.share){
+        navigator.share({title:'รายงานของฉัน (PDF)',text:'รายงานของฉัน — '+currentTech.name,url:d.url}).catch(()=>{});
+      }else{
+        window.open(d.url,'_blank');
+      }
+    }else{
+      showModal({icon:'⚠️',iconBg:'var(--danger-bg)',iconFg:'var(--danger)',title:'สร้าง PDF ไม่สำเร็จ',body:'ลองใหม่อีกครั้งนะคะ',buttons:[{label:'ตกลง',val:'ok'}]});
+    }
+  };
+  const s=document.createElement('script');
+  const dk=lastReportDateKey||todayKey();
+  s.src=SUBMIT_URL+(SUBMIT_URL.indexOf('?')<0?'?':'&')+'mypdf=1&tech='+encodeURIComponent(currentTech.name)+'&period=today&date='+dk+'&callback=__kosinPdf';
+  s.onerror=()=>{btn.textContent=orig;btn.disabled=false;};
+  document.body.appendChild(s);
+}
+$('#pdfBtn').onclick=downloadMyPdf;
 $('#backBtn').onclick=()=>{
   if(Object.keys(selected).length){
     showModal({icon:'<i class="ti ti-arrow-back-up"></i>',iconBg:'var(--amber-bg)',iconFg:'var(--amber)',title:'กลับไปเลือกชื่อ?',body:'งานที่กรอกค้างไว้จะหาย ยืนยันไหมคะ',buttons:[{label:'กลับไปเลือกชื่อ',val:'go',cls:'pri'},{label:'อยู่ต่อ',val:'stay'}]}).then(a=>{if(a.val==='go')goLogin();});
@@ -836,13 +864,24 @@ function renderScore(){
 }
 function completeDoc(id){const all=getReports();const r=all.find(x=>x.id===id);if(r){r.status='รอตรวจ';r.docDeadline='';r.photoCount=(r.photoCount||0)+1;saveReports(all);}renderScore();if(SUBMIT_URL)fetch(SUBMIT_URL,{method:'POST',body:JSON.stringify({action:'adddoc',id:id})}).catch(()=>{});}
 
-function refreshMaster(){window.__kosinData=function(d){if(d&&d.hospitals&&d.hospitals.length)window.HOSPITALS=d.hospitals;if(d&&d.technicians&&d.technicians.length){window.TECHNICIANS=d.technicians;buildLogin();}};const s=document.createElement('script');s.src=SUBMIT_URL+(SUBMIT_URL.indexOf('?')<0?'?':'&')+'list=1&callback=__kosinData';s.onerror=function(){};document.body.appendChild(s);}
+function applyHolidayData(list){
+  if(!list||!list.length)return;
+  const h={},ws={},w5={},cm={};
+  list.forEach(x=>{
+    if(x.type==='หยุด')h[x.date]=x.name;
+    else if(x.type==='เสาร์ประชุม')ws[x.date]=1;
+    else if(x.type==='5ส')w5[x.date]=x.name;
+    else if(x.type==='ประชุม')cm[x.date]=x.name;
+  });
+  HOLIDAYS=h;WORK_SAT=ws;WORK_5S=w5;COMPANY_MEETING=cm;
+}
+function refreshMaster(){window.__kosinData=function(d){if(d&&d.hospitals&&d.hospitals.length)window.HOSPITALS=d.hospitals;if(d&&d.tcjHospitals&&d.tcjHospitals.length){window.TCJ_HOSPITALS=d.tcjHospitals;rebuildTcjHosMap();}if(d&&d.technicians&&d.technicians.length){window.TECHNICIANS=d.technicians;buildLogin();}applyHolidayData(d&&d.holidays);};const s=document.createElement('script');s.src=SUBMIT_URL+(SUBMIT_URL.indexOf('?')<0?'?':'&')+'list=1&callback=__kosinData';s.onerror=function(){};document.body.appendChild(s);}
 /* ===== แพลนงานสัปดาห์ (อา–ส) + สรุปแผน vs จริง ===== */
 const THAI_DOW=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
 /* ปฏิทินบริษัท ก.ค.–ธ.ค. 2569 (2026) — ขึ้นปีใหม่ต้องอัปเดต */
-const HOLIDAYS={'2026-07-28':'วันเกิด ร.10','2026-07-29':'วันอาสาฬหบูชา','2026-08-12':'วันแม่','2026-10-13':'วันสวรรคต ร.9','2026-10-23':'วันปิยมหาราช','2026-12-07':'ชดเชยวันพ่อ','2026-12-10':'วันรัฐธรรมนูญ','2026-12-31':'วันสิ้นปี'};
-const WORK_SAT={'2026-07-04':1,'2026-08-01':1,'2026-09-05':1,'2026-10-03':1,'2026-11-07':1,'2026-12-12':1};
-const WORK_5S={'2026-08-22':'ทำ 5ส','2026-12-19':'ทำ 5ส'};
+let HOLIDAYS={'2026-07-28':'วันเกิด ร.10','2026-07-29':'วันอาสาฬหบูชา','2026-08-12':'วันแม่','2026-10-13':'วันสวรรคต ร.9','2026-10-23':'วันปิยมหาราช','2026-12-07':'ชดเชยวันพ่อ','2026-12-10':'วันรัฐธรรมนูญ','2026-12-31':'วันสิ้นปี'};
+let WORK_SAT={'2026-07-04':1,'2026-08-01':1,'2026-09-05':1,'2026-10-03':1,'2026-11-07':1,'2026-12-12':1};
+let WORK_5S={'2026-08-22':'ทำ 5ส','2026-12-19':'ทำ 5ส'};
 function dayInfo(dk){
   if(HOLIDAYS[dk])return{off:true,name:HOLIDAYS[dk]};
   if(WORK_SAT[dk])return{off:false,name:'เสาร์ประชุม',special:true};
@@ -865,8 +904,24 @@ function holidayCalc(){
   const hasOther=sel.some(s=>BOOTH_CODES.indexOf(s.code)<0);
   return{bonus:hasBooth?(boothFull?600:300):0, hasBooth:hasBooth, ot:hasOther&&currentTech.name!==NO_OT_TECH};
 }
-let planWeek=null, planView='month', planMonth=null;
+let planWeek=null, planView='month', planMonth=null, myPlansFetchedFor=null;
 function sundayStart(d){d=d?new Date(d):new Date();d.setDate(d.getDate()-d.getDay());return dkey(d);}
+function fetchMyPlans(){
+  if(!SUBMIT_URL||!currentTech||myPlansFetchedFor===currentTech.name)return;
+  myPlansFetchedFor=currentTech.name;
+  window.__kosinMyPlans=function(d){
+    if(!d||!d.plans)return;
+    const all=loadPlans();
+    all[currentTech.name]=all[currentTech.name]||{};
+    Object.keys(d.plans).forEach(ws=>{ if(!all[currentTech.name][ws]) all[currentTech.name][ws]=d.plans[ws]; });
+    savePlans(all);
+    if(planView)renderPlan();
+  };
+  const s=document.createElement('script');
+  s.src=SUBMIT_URL+(SUBMIT_URL.indexOf('?')<0?'?':'&')+'myplans=1&tech='+encodeURIComponent(currentTech.name)+'&callback=__kosinMyPlans';
+  s.onerror=function(){myPlansFetchedFor=null;};
+  document.body.appendChild(s);
+}
 function viewToggleHtml(active){return '<div style="display:flex;gap:6px;margin-bottom:10px"><button class="tab'+(active==='week'?' on':'')+'" data-view="week" style="flex:1">รายสัปดาห์</button><button class="tab'+(active==='month'?' on':'')+'" data-view="month" style="flex:1">ปฏิทินเดือน</button></div>';}
 function bindViewToggle(){$$('#planBody [data-view]').forEach(b=>b.onclick=()=>{planView=b.dataset.view;renderPlan();});}
 function renderPlanMonth(){
