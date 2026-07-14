@@ -796,7 +796,7 @@ function showOk(recs,h,all){
   $('#okSumm').innerHTML='<div class="r"><span>ช่าง</span><span>'+recs[0].tech+'</span></div><div class="r"><span>สถานที่</span><span>'+recs[0].hospital+'</span></div><div class="tasks" style="padding:8px 0">'+list+'</div><div class="r"><span>รวม</span><span>'+recs.length+' งาน · '+totPh+' รูป</span></div>';
   const mine=all.filter(r=>(r.pin===currentTech.pin||r.tech===currentTech.name)&&r.dateKey===todayKey());
   $('#todayCount').textContent='วันนี้คุณรายงานแล้ว '+mine.length+' งาน';
-  
+          }
 $('#againBtn').onclick=()=>{$('#scrOk').classList.add('hidden');$('#scrApp').classList.remove('hidden');switchTab('report');resetForm();};
 function goLogin(){currentTech=null;clearSession();$('#scrOk').classList.add('hidden');$('#scrApp').classList.add('hidden');$('#scrLogin').classList.remove('hidden');buildLogin();}
 $('#logoutBtn').onclick=goLogin;
